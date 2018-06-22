@@ -3,6 +3,7 @@ import java.util.Collections;
 
 public class Game {
 	static protected ArrayList<Player> players;
+	static protected ArrayList<Integer> playersState = new ArrayList<Integer>();
 	static protected ArrayList<String> policiesDeck = new ArrayList<String>();
 	static protected ArrayList<String> roles = new ArrayList<String>();
 	static protected int libPolicies;
@@ -48,6 +49,7 @@ public class Game {
 			result.add("hey");
 		}
 		for(int i = 0; i < pl.size(); i++) {
+			playersState.add(pl.get(i).getState());
 			if(pl.get(i).getRole().equals("Fascist")) {
 				result.set(1, Integer.toString(pl.get(i).getState()));
 			}

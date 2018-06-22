@@ -52,23 +52,20 @@ public class Player {
 		System.out.println(one+"\n"+two+"\n"+three);
 	}
 	
-	public int killPlayer(ArrayList<Player> players) { //MAIS TARDE MUDAR POR CAUSA DA CENA DO PLAYER 0
+	public int killPlayer(ArrayList<Integer> players) { //MAIS TARDE MUDAR POR CAUSA DA CENA DO PLAYER 0
 		System.out.println("President, choose one player to kill");
 		int choice = sc.nextInt();
 		boolean canKill = false;
-		ArrayList<Integer> states = new ArrayList<Integer>();
-		for(int i = 0; i < players.size(); i++) {
-			states.add(players.get(i).getState());
-		}
-		states.remove(state);
-		if(states.contains(choice)) {
+		players.remove(state);
+		if(players.contains(choice)) {
 			canKill = true;
 		}
 		while(!canKill) {
 			System.out.println("That player doesn't exist, was killed or is you!");
 			choice = sc.nextInt();
-			canKill = states.contains(choice);			
+			canKill = players.contains(choice);			
 		}
+		
 		return choice;
 	}
 }

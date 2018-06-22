@@ -38,7 +38,7 @@ public class GameRun extends Game{
 	
 	private int chooseChancellor(int pl) {
 		int chosen;
-		System.out.println("player " + players.get(pl).getState() + " you're the President, choose the Chancellor");
+		System.out.println("player " + playersState.get(pl) + " you're the President, choose the Chancellor");
 		chosen = players.get(pl).chooseChancellor(pl, lastChancellor);
 		System.out.println("The President chose Player " + chosen + " as the Chancellor, let's vote this decision\nDo you agree with this decision? Ja!/Nein!(Y/N)");
 		ArrayList<String> votes = new ArrayList<String>();
@@ -112,8 +112,11 @@ public class GameRun extends Game{
 			}
 			players.get(president).checkThreeCards(policiesDeck.get(0), policiesDeck.get(1), policiesDeck.get(2));
 		}
-		if(fasPolicies == 4) {
-			int kill = players.get(president).killPlayer(players);
+		else if(fasPolicies == 4 || fasPolicies == 5) { // INCLUDE THE VETO POWER!
+			int eliminate = players.get(president).killPlayer(playersState);
+			eliminate = playersState.indexOf(eliminate);
+			playersState.remove((int) eliminate);
+			players.remove(eliminate);
 		}
 		if(fasPolicies == 5) {
 			
