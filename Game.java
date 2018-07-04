@@ -43,7 +43,7 @@ public class Game {
 	}
 
 	
-	public ArrayList<String> showRole(ArrayList<Player> pl) {
+	/*public ArrayList<String> showRole(ArrayList<Player> pl) {
 		ArrayList<String> result = new ArrayList<String>();
 		for(int i = 0; i < 3; i++) {
 			result.add("hey");
@@ -64,10 +64,17 @@ public class Game {
 		players = new ArrayList<Player>(pl);
 		System.out.println(result);
 		return result;
-	}
+	}*/
 	
 	
 	public ArrayList<String> getRoles(){
 		return roles;
+	}
+
+	public void makePlayersState(ArrayList<Player> pl) {
+		for(int i = 0; i < pl.size(); i++) {
+			playersState.add(pl.get(i).getState());
+		}
+		players = new ArrayList<Player>(pl);
 	}
 }
