@@ -12,7 +12,7 @@ public class Main {
 			fascists.add(-1);
 		}
 		for(int i = 0; i < 5; i++) {
-			HonestBot n_player = new HonestBot(roles.get(i), i);
+			RandomBot n_player = new RandomBot(roles.get(i), i);
 			players.add(n_player);
 			if(roles.get(i).equals("Hitler")) {
 				fascists.set(1, i);

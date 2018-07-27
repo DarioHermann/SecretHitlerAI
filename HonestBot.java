@@ -21,8 +21,6 @@ public class HonestBot extends Player{
 	}
 	
 	public int chooseChancellor(int president, int lastChancellor, ArrayList<Integer> players) {
-
-		System.out.println("he!");
 		int choose;
 		if(role.equals("Liberal")) {
 			choose = rnd.nextInt(5);
@@ -32,7 +30,6 @@ public class HonestBot extends Player{
 		while(choose == president || choose == lastChancellor || !players.contains(choose)) {
 			choose = rnd.nextInt(5);
 		}
-		System.out.println(choose);
 		return choose;
 	}
 	
