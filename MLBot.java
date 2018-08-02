@@ -19,7 +19,6 @@ public class MLBot extends Player{
 	
 	
 //	NN input Variables
-	private boolean canVeto;
 	private int pres;
 	private int chanc;
 	private int lastChanc;
@@ -42,7 +41,6 @@ public class MLBot extends Player{
 		supposedFasCards = 0;
 		electionTracker = 0;
 		
-		canVeto = false;
 		pres = -1;
 		chanc = -1;
 		lastChanc = -1;
@@ -76,7 +74,9 @@ public class MLBot extends Player{
 		otherPlayers.get(state).setRole("Me");
 	}
 	
-	private float[] inputNN(boolean isPres, boolean isChanc, boolean abilityNextPres, boolean abilityKillPlayer, boolean vetoOn, boolean vote, int cardOne, int cardTwo, int cardThree) {
+	//vetoOn = veto is on, if 1 means the bot has to vote if he agrees with veto
+	//canVeto = the power to veto is on, so that's a choice the bot can make
+	private float[] inputNN(boolean isPres, boolean isChanc, boolean abilityNextPres, boolean abilityKillPlayer, boolean vetoOn, boolean canVeto, boolean vote, int cardOne, int cardTwo, int cardThree) {
 		float[] inps = new float[30];
 		for(int i = 0; i < inps.length; i++) {
 			inps[i] = 0;
@@ -129,34 +129,155 @@ public class MLBot extends Player{
 		}
 		
 		
-		
-		return inps;
+		float[] output = nn.calculateNN(inps);
+		return output;
 	}
 	
 	
 	public int chooseChancellor(int president, int lastChancellor, ArrayList<Integer> players) {
-		int choose;
 		ArrayList<Integer> pls = new ArrayList<Integer>(players);
 		pls.remove((Object) president);
 		pls.remove((Object) lastChancellor);
-		float[] inps = new float[pls.size()];
-		for(int i = 0; i < pls.size(); i++)
-		{
-			inps[i] = otherPlayers.get(pls.get(i)).getTrustLevel();
-		}
-		float[] lol = nn.calculateNN(inps);
-		float[] lool = new float[4];
+		
+		float[] lol = inputNN(true, false, false, false, false, false, false, 0, 0, 0);
 		int[] numbs = new int[4];
 		for(int i = 0; i < 4; i++) {
-			lool[i] = lol[i];
 			numbs[i] = i;
 		}
 		for(int i = 0; i < 3; i++) {
 			for(int j = 0; j < 3 - i; j++) {
-				if(lool[j] > lool[j+1]) {
-					float x = lool[j];
-					lool[j] = lool[j+1];
-					lool[j+1] = x;
+				if(lol[j] < lol[j+1]) {
+					float x = lol[j];
+					lol[j] = lol[j+1];
+					lol[j+1] = x;
+					
+					int y = numbs[j];
+					numbs[j] = numbs[j+1];
+					numbs[j+1] = y;
+				}
+			}
+		}
+		for(int i = 0; i < 4; i++) {
+			if(numbs[i] != president && numbs[i] != lastChancellor && players.contains(numbs[i])) {
+				return numbs[i];
+			}
+		}
+		return numbs[3];
+	}
+	
+	public String vote(int president, int chancellor) {
+		float[] out = inputNN(state == president? true : false, state == chancellor? true : false, false, false, false, false, true, 0, 0, 0);
+		
+		if(out[4] >= out[5]) {
+			return "Y";
+		}
+		else {
+			return "N";
+		}
+	}
+	
+	public int discardCard(String one, String two, String three) {
+		int[] _pol = new int[3];
+		String[] pol = new String[3];
+		pol[0] = one;
+		pol[1] = two;
+		pol[2] = three;
+		for(int i = 0; i < 3; i++) {
+			_pol[i] = pol[i].equals("Liberal") ? 1 : -1; 
+		}
+		
+		float[] out = inputNN(true, false, false, false, false, false, false, _pol[0], _pol[1], _pol[2]); //ADICIONAR A OPÇÃO DE DISCARD PARA O INPUT
+		
+		int[] numbs = new int[3];
+		for(int i = 0; i < 3; i++) {
+			numbs[i] = i;
+		}
+		
+		for(int i = 0; i < 2; i++) {
+			for(int j = 0; j < 2-i; j++) {
+				if(out[j+6] < out[j+7]) {
+					float x = out[j+6];
+					out[j+6] = out[j+7];
+					out[j+7] = out[j+6];
+					
+					int y = numbs[j];
+					numbs[j] = numbs[j+1];
+					numbs[j+1] = y;
+				}
+			}
+		}
+		
+		return numbs[0];
+	}
+	
+	public int discardCards(String one, String two, boolean veto) {
+		int[] _pol = new int[2];
+		String[] pol = new String[2];
+		pol[0] = one;
+		pol[1] = two;
+		
+		for(int i = 0; i < 2; i++) {
+			_pol[i] = pol[0].equals("Liberal") ? 1 : -1;
+		}
+		
+		float[] out = inputNN(false, true, false, false, false, veto, false, _pol[0], _pol[1], 0);
+		
+		int[] numbs = new int[3];
+		for(int i = 0; i < 3; i++) {
+			numbs[i] = i;
+		}
+		
+		out[8] = out[9];
+		
+		for(int i = 0; i < 2; i++) {
+			for(int j = 0; j < 2-i; j++) {
+				if(out[j+6] < out[j+7]) {
+					float x = out[j+6];
+					out[j+6] = out[j+7];
+					out[j+7] = x;
+					
+					int y = numbs[j];
+					numbs[j] = numbs[j+1];
+					numbs[j+1] = y;
+				}
+			}
+		}
+		
+		if(numbs[0] == 2 && !veto) {
+			return numbs[1];
+		} else {
+			return numbs[0];
+		}
+	}
+	
+	public boolean voteVeto(String one, String two) {
+		int[] _pol = new int[2];
+		String[] pol = new String[2];
+		pol[0] = one;
+		pol[1] = two;
+		for(int i = 0; i < 2; i++) {
+			_pol[i] = pol[i].equals("Liberal") ? 1 : -1;
+		}
+		
+		float[] out = inputNN(true, false, false, false, true, true, true, _pol[0], _pol[1], 0);
+		
+		if(out[4] >= out[5]) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public int killPlayer(ArrayList<Integer> players) {
+		float[] out = inputNN(true, false, false, true, false, false, false, 0, 0, 0);
+		
+		int[] numbs = new int[4];
+		for(int i = 0; i < 3; i++) {
+			for(int j = 0; j < 3-i; j++) {
+				if(out[j] < out[j+1]) {
+					float x = out[j];
+					out[j] = out[j+1];
+					out[j+1] = x;
 					
 					int y = numbs[j];
 					numbs[j] = numbs[j+1];
@@ -166,10 +287,10 @@ public class MLBot extends Player{
 		}
 		
 		for(int i = 0; i < 4; i++) {
-			if(numbs[i] != president && numbs[i] != lastChancellor && players.contains(numbs[i])) {
+			if(players.contains(numbs[i])) {
 				return numbs[i];
 			}
 		}
-		return numbs[3];
+		return 2;
 	}
 }
