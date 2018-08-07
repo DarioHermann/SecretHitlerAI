@@ -20,7 +20,8 @@ public class NN {
 	
 	private void initialWeights(int inps) {
 		inputs = inps;
-		outputW = new float[10][];
+		outputW = new float[18][];
+		outputB = new float[18];
 		hiddenLayerW = new float[hiddenLayer.length][];
 		hiddenLayerB = new float[hiddenLayer.length];
 		
@@ -53,7 +54,7 @@ public class NN {
 		
 		
 		for(int i = 0; i < outputW.length; i++) {
-			for(int j = 0; j < outputW[i].length; i++) {
+			for(int j = 0; j < outputW[i].length; j++) {
 				outputW[i][j] = w[(hiddenLayer.length * (inputs+1)) + (i * outputW[i].length) + i + j];
 			}
 			outputB[i] = w[(hiddenLayer.length * (inputs+1)) + (outputW[i].length * (i+1)) + i];
@@ -91,8 +92,8 @@ public class NN {
 			hiddenLayer[i] = reLU(sum(inps, hiddenLayerW[i]) + hiddenLayerB[i]);
 		}
 		
-		float[] output = new float[10];
-		for(int i = 0; i < 10; i++) {
+		float[] output = new float[18];
+		for(int i = 0; i < 18; i++) {
 			output[i] = softSign(sum(outputW[i], hiddenLayer) + outputB[i]);
 		}
 		

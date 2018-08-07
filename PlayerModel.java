@@ -5,12 +5,14 @@ public class PlayerModel {
 	private float trustLevel;
 	private float theirTrustLevel;
 	private boolean isHitler;
+	private boolean isDead;
 	private LinkedList<String> moves;
 	
 	public PlayerModel() {
 		trustLevel = 0;
 		theirTrustLevel = 0;
 		isHitler = true;
+		isDead = false;
 		moves = new LinkedList<String>();
 	}
 	
@@ -118,5 +120,9 @@ public class PlayerModel {
 	
 	public float getTheirTrustLevel() {
 		return theirTrustLevel;
+	}
+	
+	public boolean getDeathStatus() {
+		return isDead;
 	}
 }

@@ -97,7 +97,7 @@ public class GameRun extends Game{
 		int discard = players.get(president).discardCard(policiesDeck.get(0), policiesDeck.get(1), policiesDeck.get(2));
 		policiesDeck.remove(discard);
 		discard = players.get(playersState.indexOf(chancellor)).discardCard(policiesDeck.get(0), policiesDeck.get(1), vetoPowerOn);
-		if(discard == 3) {
+		if(discard == 2) {
 			veto = players.get(president).voteVeto(policiesDeck.get(0), policiesDeck.get(1));
 			if(veto) {
 				electionTracker++;
@@ -110,7 +110,7 @@ public class GameRun extends Game{
 					electionTracker = 0;
 					policiesDeck.remove(0);
 				}
-			} else {
+			} else if(vetoPowerOn){
 				System.out.println("The President didn't accept your veto, Chancellor choose one of the policies in you hand");
 				discard = players.get(chancellor).discardCard(policiesDeck.get(0), policiesDeck.get(1), false);
 			}
