@@ -11,9 +11,9 @@ public class RandomBot extends Player {
 	}
 
 	public int chooseChancellor(int president, int lastChancellor, ArrayList<Integer> players) {
-		int choose = rnd.nextInt(5);
+		int choose = rnd.nextInt(5) + 1;
 		while (choose == president || choose == lastChancellor || !players.contains(choose)) {
-			choose = rnd.nextInt(5);
+			choose = rnd.nextInt(5) + 1;
 		}
 		return choose;
 	}

@@ -23,12 +23,12 @@ public class HonestBot extends Player{
 	public int chooseChancellor(int president, int lastChancellor, ArrayList<Integer> players) {
 		int choose;
 		if(role.equals("Liberal")) {
-			choose = rnd.nextInt(5);
+			choose = rnd.nextInt(5)+1;
 		} else {
 			choose = otherFascist;
 		}
 		while(choose == president || choose == lastChancellor || !players.contains(choose)) {
-			choose = rnd.nextInt(5);
+			choose = rnd.nextInt(5)+1;
 		}
 		return choose;
 	}

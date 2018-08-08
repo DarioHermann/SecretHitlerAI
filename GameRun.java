@@ -28,7 +28,7 @@ public class GameRun extends Game{
 				chancellor = chooseChancellor(president);
 			}while(chancellor == -1);
 			lastChancellor = chancellor;
-			if(chancellor != players.size()) {
+			if(chancellor != players.size()+1) {
 				if(fasPolicies >= 3 && players.get(playersState.indexOf(chancellor)).getRole().equals("Hitler")) {
 					System.out.println("Hitler was elected as the Chancellor after three fascist policies have been enacted");
 					fasPolicies = 6;
@@ -55,9 +55,9 @@ public class GameRun extends Game{
 		System.out.println("player " + playersState.get(pl) + " you're the President, choose the Chancellor");
 		System.out.println(players);
 		if(!playersState.contains(lastChancellor)) {
-			lastChancellor = pl;
+			lastChancellor = playersState.get(pl);
 		}
-		chosen = players.get(pl).chooseChancellor(playersState.get(pl), playersState.indexOf(lastChancellor), playersState);
+		chosen = players.get(pl).chooseChancellor(playersState.get(pl), lastChancellor, playersState);
 		System.out.println("The President chose Player " + chosen + " as the Chancellor, let's vote this decision\nDo you agree with this decision? Ja!/Nein!(Y/N)");
 		ArrayList<String> votes = new ArrayList<String>();
 		for(int i = 0; i < players.size(); i++) {
@@ -82,7 +82,7 @@ public class GameRun extends Game{
 				String policy = policiesDeck.remove(0);
 				enactPolicy(policy);
 				electionTracker = 0;
-				return players.size();
+				return players.size()+1;
 			}
 			return -1;
 		}
@@ -109,6 +109,7 @@ public class GameRun extends Game{
 					enactPolicy(policy);
 					electionTracker = 0;
 					policiesDeck.remove(0);
+					discard = 3;
 				}
 			} else if(vetoPowerOn){
 				System.out.println("The President didn't accept your veto, Chancellor choose one of the policies in you hand");

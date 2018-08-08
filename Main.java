@@ -13,12 +13,12 @@ public class Main {
 		}
 		for(int i = 0; i < 5; i++) {
 			//RandomBot n_player = new RandomBot(roles.get(i), i);
-			MLBot n_player = new MLBot(roles.get(i), i);
+			MLBot n_player = new MLBot(roles.get(i), i+1);
 			players.add(n_player);
 			if(roles.get(i).equals("Hitler")) {
-				fascists.set(1, i);
+				fascists.set(1, i+1);
 			} else if(roles.get(i).equals("Fascist")) {
-				fascists.set(0, i);
+				fascists.set(0, i+1);
 			}
 		}
 		Collections.shuffle(players);
