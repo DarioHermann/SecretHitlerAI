@@ -11,11 +11,13 @@ public class MLBot extends Player{
 //	GameVariables
 //	private int numLibCards;
 //	private int numFasCards;
+	private int deckPolicies;
 	private int libCardsEnacted;
 	private int fasCardsEnacted;
 	private int supposedLibCards;
 	private int supposedFasCards;
 	private int electionTracker;
+	private int[] threeCards;
 	
 	
 //	NN input Variables
@@ -23,7 +25,7 @@ public class MLBot extends Player{
 	private int chanc;
 	private int lastChanc;
 	private int lastPres;
-	private int lastPlayed;
+	private float lastPlayed;
 	
 //	Other Players
 	private LinkedList<PlayerModel> otherPlayers;
@@ -34,14 +36,20 @@ public class MLBot extends Player{
 	
 	public MLBot(String role, int state) {
 		super(role, state);
+		typeOfPlayer = 1;
 		nn = new NN(48, 30);
 //		numLibCards = 6;
 //		numFasCards = 11;
+		deckPolicies = 17;
 		libCardsEnacted = 0;
 		fasCardsEnacted = 0;
 		supposedLibCards = 0;
 		supposedFasCards = 0;
 		electionTracker = 0;
+		threeCards = new int[3];
+		for(int i = 0; i < 3; i++) {
+			threeCards[i] = 0;
+		}
 		
 		pres = 0;
 		chanc = 0;
@@ -393,5 +401,246 @@ public class MLBot extends Player{
 		results[2] = "0 Liberals 2 Fascists";
 		
 		return results[choose[0]];
+	}
+	
+	public void checkThreeCards(String one, String two, String three) {
+		String[] pl = new String[3];
+		pl[0] = one;
+		pl[1] = two;
+		pl[2] = three;
+		
+		for(int i = 0; i < 3; i++) {
+			threeCards[i] = pl[i].equals("Liberal") ? 1 : -1;
+		}
+	}
+	
+	public void checkPlay(String _play) {
+		String[] play = _play.split(",");
+		
+		int gotKilled = 0;
+		boolean fascistVictory = false;
+		boolean liberalVictory = false;
+		boolean hitlerKilled = false;
+		boolean hitlerVoted = false;
+		boolean _veto = false;
+		boolean _noVeto = false;
+		
+		int optionTrust = -1;
+		
+		int _pres = Integer.parseInt(play[0]);
+		int _chanc = Integer.parseInt(play[1]);
+		
+		if(play[2].equals("Y")) { //president and chancellor got accepted
+			if(deckPolicies < 3) {
+				deckPolicies = 17 - libCardsEnacted - fasCardsEnacted;
+				supposedFasCards = 0;
+				supposedLibCards = 0;
+			}
+			deckPolicies -=3;
+			if(play[3].equals("L")) { //played liberal policy
+				if(_pres != state) {
+					otherPlayers.get(_pres-1).increaseTrust();
+				} else {
+					optionTrust = 0;
+				}
+				if(_chanc != state) {
+					otherPlayers.get(_chanc-1).increaseTrust();
+				} else {
+					optionTrust = 0;
+				}
+			} else if(play[3].equals("F")) { //played Fascist policy
+				if(_pres != state) {
+					if(_pres != otherFascist) {
+						otherPlayers.get(_pres-1).decreaseTrust();
+					} else {
+						otherPlayers.get(otherFascist).increaseTrust();
+					}
+				} else {
+					optionTrust = 1;
+				}
+				if(_chanc != state) {
+					if(_chanc != otherFascist) {
+						otherPlayers.get(_chanc-1).decreaseTrust();
+					} else {
+						otherPlayers.get(otherFascist).increaseTrust();
+					}
+				} else {
+					optionTrust = 1;
+				}
+				
+				if(play.length > 4 && play[4].equals("FW")) { //if fascists win
+					fascistVictory = true;
+				}
+				else if(play.length > 4) { //if someone got killed
+					gotKilled = Integer.parseInt(play[4]);
+					if(play.length > 5) { //if Hitler died
+						hitlerKilled = true;
+						liberalVictory = true;
+					}
+				}
+			} else if(play[3].equals("HW")) { //if Hitler is voted Chancellor after 3 fascist policies are enacted
+				hitlerVoted = true;
+				fascistVictory = true;
+			} else if(play[3].equals("V")) { //If Veto occurred
+				_veto = true;
+				if(play.length > 4) { //If election Tracker reached the limit
+					if(deckPolicies < 1) {
+						deckPolicies = 17 - libCardsEnacted - fasCardsEnacted;
+						supposedFasCards = 0;
+						supposedLibCards = 0;
+					}
+					deckPolicies--;
+					if(play[4].equals("L")) {  //liberal policy came out
+						if(_pres != state) {
+							otherPlayers.get(_pres-1).increaseTheirTrust();
+						} else {
+							optionTrust = 0;
+						}
+						if(_chanc != state) {
+							otherPlayers.get(_chanc-1).increaseTheirTrust();
+						} else {
+							optionTrust = 0;
+						}
+						
+						if(play.length > 5) {
+							liberalVictory = true;
+						}
+					} else if(play[4].equals("F")) { //fascist policy came out, fascists win because if veto is on and fascist policy came out, they win because they enacted 6 policies
+						if(_pres != state) {
+							if(_pres != otherFascist) {
+								otherPlayers.get(_pres-1).decreaseTrust();
+							}
+						} else {
+							optionTrust = 2;
+						}
+						if(_chanc != state) {
+							if(_chanc != otherFascist) {
+								otherPlayers.get(_chanc-1).decreaseTrust();
+							}
+						} else {
+							optionTrust = 2;
+						}
+						
+						fascistVictory = true;
+					}
+				}
+			} else if (play[3].equals("NV")) { //If the President doesn't accept the Veto
+				_noVeto = true;
+				if(play[4].equals("F")) { //If the Chanc chooses Fascist policy
+					if(_pres != state) {
+						if(_pres != otherFascist) {
+							otherPlayers.get(_pres-1).decreaseTrust();
+							otherPlayers.get(_pres-1).decreaseTrust();
+						}
+						otherPlayers.get(_pres-1).decreaseTrust();
+					} else {
+						optionTrust = 4;
+					}
+					if(_chanc != state) {
+						otherPlayers.get(_chanc-1).increaseTrust();
+					} else {
+						optionTrust = 0;
+					}
+				} else if (play[4].equals("L")) { //If the Chanc chooses Liberal Policy
+					if(_pres != state) {
+						otherPlayers.get(_pres-1).increaseTrust();
+						otherPlayers.get(_pres-1).increaseTrust();
+						otherPlayers.get(_pres-1).increaseTrust();
+					} else {
+						optionTrust = 3;
+					}
+					if(_chanc != state) {
+						if(_chanc != otherFascist){
+							otherPlayers.get(_chanc-1).decreaseTrust();
+							otherPlayers.get(_chanc-1).decreaseTrust();
+						}
+						otherPlayers.get(_chanc-1).decreaseTrust();
+					} else {
+						optionTrust = 4;
+					}
+						
+					if(play.length > 5) {
+						liberalVictory = true;
+					}
+				}
+			}
+		} else { //if The voters voted No on the President and Chancellor
+			if(play.length > 4) { //If tracker reached limit
+				if(deckPolicies < 1) {
+					deckPolicies = 17 - libCardsEnacted - fasCardsEnacted;
+					supposedFasCards = 0;
+					supposedLibCards = 0;
+				}
+				deckPolicies--;
+				if(play[5].equals("LW")) {
+					liberalVictory = true;
+				} else if(play[5].equals("FW")) {
+					fascistVictory = true;
+				}
+			}
+		}
+		
+		if(play.length == 3) { //so existe no caso de ambos o presidente e o chencellor nao terem sido aceites e o election tracker nao ter chegado ao limite
+			electionTracker++;
+		}
+		if(play.length > 3) {
+			lastPres = _pres;
+			lastChanc = _chanc;
+			if(_veto) {
+				lastPlayed = (float) (play[4].equals("L") ? 1.5 : -1.5);
+			} else if(_noVeto) {
+				lastPlayed = (float) (play[4].equals("L") ? 0.5: -0.5);
+			}
+			if(gotKilled != 0) {
+				otherPlayers.get(gotKilled-1).died();
+			}
+			if(play[2].equals("Y") && fasCardsEnacted >= 3 && !hitlerVoted) {
+				otherPlayers.get(_chanc-1).detectHitler(false);
+			}
+			if(hitlerKilled) {
+				for(int i = 0; i < 5; i++) {
+					otherPlayers.get(i).detectHitler(false);
+				}
+				otherPlayers.get(gotKilled-1).detectHitler(true);
+			}
+		}
+		
+		if(optionTrust != -1) {
+			if(optionTrust == 0) {
+				for(int i = 0; i < 5; i++) {
+					if(i != state-1) {
+						otherPlayers.get(i).increaseTheirTrust();
+					}
+				}
+			} else if (optionTrust <= 2) {
+				for(int i = 0; i < 5; i++) {
+					if(i != state -1) {
+						if(optionTrust == 1 && i == otherFascist -1) {
+							otherPlayers.get(i).increaseTheirTrust();
+						} else {
+							otherPlayers.get(i).decreaseTheirTrust();
+						}
+					}
+				}
+			} else if(optionTrust == 3) {
+				for(int i = 0; i < 5; i++) {
+					if(i != state -1) {
+						otherPlayers.get(i).increaseTheirTrust();
+						otherPlayers.get(i).increaseTheirTrust();
+						otherPlayers.get(i).increaseTheirTrust();
+					}
+				}
+			} else if (optionTrust == 4) {
+				for(int i = 0; i < 5; i++) {
+					if(i != state -1) {
+						otherPlayers.get(i).decreaseTheirTrust();
+						if(i != otherFascist -1) {
+							otherPlayers.get(i).decreaseTheirTrust();
+							otherPlayers.get(i).decreaseTheirTrust();
+						}
+					}
+				}
+			}
+		}
 	}
 }

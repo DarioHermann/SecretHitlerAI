@@ -5,11 +5,17 @@ public class Player {
 	protected String role;
 	protected int state;
 	protected Scanner sc;
+	protected int typeOfPlayer;
 	
 	public Player(String role, int state) {
 		this.role = role;
 		this.state = state;
+		typeOfPlayer = 0;
 		sc = new Scanner(System.in);
+	}
+	
+	public int getTypeOfPlayer() {
+		return typeOfPlayer;
 	}
 	
 	public String getRole() {
@@ -128,6 +134,10 @@ public class Player {
 
 	public void receiveRole(ArrayList<Integer> fascists) {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	public void checkPlay(String play) {
 		
 	}
 }

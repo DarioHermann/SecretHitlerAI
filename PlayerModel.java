@@ -122,6 +122,10 @@ public class PlayerModel {
 		return theirTrustLevel;
 	}
 	
+	public void died() {
+		isDead = true;
+	}
+	
 	public boolean getDeathStatus() {
 		return isDead;
 	}

@@ -8,6 +8,7 @@ public class GameRun extends Game{
 	private int lastChancellor;
 	private boolean vetoPowerOn;
 	private boolean power;
+	private String thePlay;
 	
 	public GameRun() {
 		super();
@@ -23,6 +24,7 @@ public class GameRun extends Game{
 		lastChancellor = 0;
 		do{
 			do {
+				thePlay = "";
 				president = (president+1)%players.size();
 				lastPresident = president;
 				chancellor = chooseChancellor(president);
@@ -30,6 +32,7 @@ public class GameRun extends Game{
 			lastChancellor = chancellor;
 			if(chancellor != players.size()+1) {
 				if(fasPolicies >= 3 && players.get(playersState.indexOf(chancellor)).getRole().equals("Hitler")) {
+					thePlay += ",HW";
 					System.out.println("Hitler was elected as the Chancellor after three fascist policies have been enacted");
 					fasPolicies = 6;
 				} else {
@@ -52,12 +55,14 @@ public class GameRun extends Game{
 	
 	private int chooseChancellor(int pl) {
 		int chosen;
+		thePlay += pl;
 		System.out.println("player " + playersState.get(pl) + " you're the President, choose the Chancellor");
 		System.out.println(players);
 		if(!playersState.contains(lastChancellor)) {
 			lastChancellor = playersState.get(pl);
 		}
 		chosen = players.get(pl).chooseChancellor(playersState.get(pl), lastChancellor, playersState);
+		thePlay += "," + chosen;
 		System.out.println("The President chose Player " + chosen + " as the Chancellor, let's vote this decision\nDo you agree with this decision? Ja!/Nein!(Y/N)");
 		ArrayList<String> votes = new ArrayList<String>();
 		for(int i = 0; i < players.size(); i++) {
@@ -67,11 +72,12 @@ public class GameRun extends Game{
 		int nein = Collections.frequency(votes, "N");
 		String print = ja + " voted Ja! and " + nein + " voted Nein!\nTherefore, ";
 		if(ja > nein) {
+			thePlay += ",Y";
 			print += "the President and the Chancellor have been elected";
 			System.out.println(print);
-			electionTracker=0;
 			return chosen;
 		} else {
+			thePlay += ",N";
 			print += "the Election Tracker will move one space and a new President and Chancellor have to be chosen";
 			System.out.println(print);
 			electionTracker++;
@@ -81,8 +87,13 @@ public class GameRun extends Game{
 				}
 				String policy = policiesDeck.remove(0);
 				enactPolicy(policy);
-				electionTracker = 0;
+				power = false;
 				return players.size()+1;
+			}
+			for(int i = 0; i < players.size(); i++) {
+				if(players.get(i).getTypeOfPlayer() == 1) {
+					players.get(i).checkPlay(thePlay);
+				}
 			}
 			return -1;
 		}
@@ -100,6 +111,7 @@ public class GameRun extends Game{
 		if(discard == 2) {
 			veto = players.get(president).voteVeto(policiesDeck.get(0), policiesDeck.get(1));
 			if(veto) {
+				thePlay +=",V";
 				electionTracker++;
 				if(electionTracker == 3) {
 					if(policiesDeck.size() < 1) {
@@ -107,11 +119,11 @@ public class GameRun extends Game{
 					}
 					String policy = policiesDeck.remove(0);
 					enactPolicy(policy);
-					electionTracker = 0;
 					policiesDeck.remove(0);
-					discard = 3;
 				}
+				discard = 3;
 			} else if(vetoPowerOn){
+				thePlay +=",NV";
 				System.out.println("The President didn't accept your veto, Chancellor choose one of the policies in you hand");
 				discard = players.get(chancellor).discardCard(policiesDeck.get(0), policiesDeck.get(1), false);
 			}
@@ -126,24 +138,37 @@ public class GameRun extends Game{
 	
 	private void enactPolicy(String policy) {
 		if(policy.equals("Liberal")) {
+			thePlay +=",L";
 			libPolicies++;
 			System.out.println("Liberal policy enacted (" + libPolicies + "/5)");
 		} else {
+			thePlay +=",F";
 			fasPolicies++;
 			power = true;
 			System.out.println("Fascist policy enacted (" + fasPolicies + "/6)");
 			
 		}
+		electionTracker = 0;
 	}
 	
 	private int checkWin() {
+		int result;
 		if(libPolicies == 5) {
-			return 1;
+			thePlay += ",LW";
+			result = 1;
 		} else if (fasPolicies == 6) {
-			return 2;
+			thePlay += ",FW";
+			result = 2;
 		} else {
-			return 0;
+			result = 0;
 		}
+		
+		for(int i = 0; i < players.size(); i++) {
+			if(players.get(i).getTypeOfPlayer() == 1) {
+				players.get(i).checkPlay(thePlay);
+			}
+		}
+		return result;
 	}
 	
 	private void checkPresidentialPower(int president) {
@@ -153,20 +178,22 @@ public class GameRun extends Game{
 			}
 			players.get(president).checkThreeCards(policiesDeck.get(0), policiesDeck.get(1), policiesDeck.get(2));
 		}
-		else if(power && fasPolicies >= 4) {
+		else if(power && (fasPolicies >= 4 && fasPolicies < 6)) {
 			int eliminate = players.get(president).killPlayer(playersState);
 			eliminate = playersState.indexOf(eliminate);
 			System.out.println(playersState + "\n" + players);
-			playersState.remove((int) eliminate);
+			int psk = playersState.remove((int) eliminate);
+			thePlay += "," + psk;
 			Player shot = players.remove(eliminate);
 			System.out.println(playersState + "\n" + players);
 			if(shot.getRole().equals("Hitler")) {
+				thePlay=",HD";
 				libPolicies = 5;
 				System.out.println("Congrats Liberals, Hitler has been shot!");
 			}
-			if(fasPolicies == 5) {
-				vetoPowerOn = true;
-			}
+		}
+		if(fasPolicies == 5) {
+			vetoPowerOn = true;
 		}
 		power = false;
 	}
