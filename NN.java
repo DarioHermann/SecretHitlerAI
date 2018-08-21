@@ -126,10 +126,11 @@ public class NN {
 		}
 		
 		for(int i = 0; i < outputW.length; i++) {
-			dna += outputW[i] + ",";
+			for(int j = 0; j < outputW[i].length; j++) {
+				dna += outputW[i][j] + ",";
+			}
+			dna += outputB[i];
 		}
-		
-		dna += outputB;
 		
 		return dna;
 	}
@@ -159,5 +160,69 @@ public class NN {
 	
 	private int weightCount() {
 		return (hiddenLayerW[0].length * inputs) + outputW.length;
+	}
+	
+	public float[] calculateCost(float[] output, float[] correctValues) {
+		float tCost = 0;
+		float[] cost = new float[output.length+1];
+		for(int i = 0; i < output.length; i++) {
+			cost[i] = (float) (0.5 * ((correctValues[i] - output[i]) * (correctValues[i] - output[i])));
+			tCost += cost[i];
+		}
+		cost[cost.length-1] = tCost;
+		return cost;
+		
+	}
+	
+	public void correctNN(float[] inp, float[] out, float[] correctValues) {
+		int min = 48*30+30;
+		int max = min + 30*18+18;
+		float[] brain = getBrain();
+		float corr;
+		float[][] newOutputW = new float[outputW.length][outputW[0].length];
+		float[] newOutputB = new float[outputB.length];
+		float[][] totrespectout = new float[hiddenLayer.length][outputW.length];
+		for(int i = 0; i < outputW.length; i++) {
+			for(int j = 0; j < outputW[i].length; j++) {
+				totrespectout[j][i] = -1 * (correctValues[i] - out[i]) * out[i] * (1-out[i]);
+				corr = totrespectout[j][i] * hiddenLayer[j];
+				newOutputW[i][j] = (float) (outputW[i][j] - 0.5* corr);
+			}
+			corr = -1 * (correctValues[i] - out[i]) * out[i] * (1-out[i]);
+			newOutputB[i] = (float) (outputB[i] - 0.5*corr);
+		}
+		
+		float[] derValue = new float[hiddenLayer.length];
+		for(int i = 0; i < hiddenLayer.length; i++) {
+			derValue[i] = 0;
+		}
+		
+		for(int i = 0; i < hiddenLayerW.length; i++) {
+			for(int j = 0; j < outputW.length; j++) {
+				derValue[i] += totrespectout[i][j] * outputW[j][i];
+			}
+			derValue[i] = derValue[i] * (hiddenLayer[i] * (1-hiddenLayer[i]));
+		}
+		
+		float[][] newVals = new float[hiddenLayerW.length][hiddenLayerW[0].length];
+		
+		for(int i = 0; i < hiddenLayerW.length; i++) {
+			for(int j = 0; j < hiddenLayerW[i].length; j++) {
+				newVals[i][j] = derValue[i] * inp[j];
+			}
+		}
+		
+		for(int i = 0; i < hiddenLayerW.length; i++) {
+			for(int j = 0; j < hiddenLayerW[i].length; j++) {
+				hiddenLayerW[i][j] = newVals[i][j];
+			}
+		}
+		
+		for(int i = 0; i < outputW.length; i++) {
+			for(int j = 0; j < outputW[i].length; j++) {
+				outputW[i][j] = newOutputW[i][j];
+			}
+			outputB[i] = newOutputB[i];
+		}
 	}
 }
