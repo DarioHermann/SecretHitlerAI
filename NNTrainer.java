@@ -1,7 +1,13 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -12,6 +18,7 @@ public class NNTrainer {
 	private Random rnd = new Random(System.currentTimeMillis());
 	private ArrayList<String> player_roles = new ArrayList<String>();
 	private int otherFascist;
+	Scanner sc = new Scanner(System.in);
 	
 	private int lastPresident = 0;
 	private int lastChancellor = 0;
@@ -32,13 +39,16 @@ public class NNTrainer {
 	private ArrayList<PlayerModel> pl_model = new ArrayList<PlayerModel>();
 	private ArrayList<Integer> cardPile = new ArrayList<Integer>();
 	
-	public void train() {
+	public int train() {
+		
+		nn = new NN(48, 30);
+		 
 		float[] inp = new float[48];
 		for(int i = 0; i < 48; i++) {
 			inp[i] = 0;
 		}
 		
-		int state = rnd.nextInt()+1;
+		int state = rnd.nextInt(5)+1;
 		inp[0] = state; //my state
 		
 		for(int i = 0; i < 5; i++) {
@@ -82,7 +92,9 @@ public class NNTrainer {
 		inp[37] = 6; //Max Liberal
 		inp[38] = 11; //Max Fascist
 		
-		int numb_rounds = rnd.nextInt(28)+1;
+		int numb_rounds = rnd.nextInt(12)+1;
+		
+		System.out.println(numb_rounds);
 		
 		int president = 0;
 		int chancellor = 0;
@@ -91,6 +103,7 @@ public class NNTrainer {
 		
 		for(int i = 0; i < numb_rounds; i++) {
 			String pl = "";
+			System.out.println("fasPolicies: " + fasPolicies + "\nlibPolicies:" + libPolicies);
 			vetoed = false;
 			//successVeto = false;
 			if(fasPolicies >= 6 || libPolicies >= 5) {
@@ -100,6 +113,7 @@ public class NNTrainer {
 			lastPresident = president;
 			lastChancellor = chancellor;
 			lastPlayed = played;
+			played = 0;
 			do{
 				president = president %5 + 1;
 			} while(pl_model.get(president - 1).getDeathStatus());
@@ -112,12 +126,14 @@ public class NNTrainer {
 			if(rnd.nextFloat() > 0.4) { //If yes is voted
 				pl += ",Y";
 				if(fasPolicies >= 3 && player_roles.get(chancellor-1).equals("Hitler")) { //if hitler is chancellor after 3 fas policies were enacted
+					pl += ",HW";
 					fasPolicies = 6;
 					breakStatus = true;
 					break;
 				} else if(fasPolicies >= 3) {
 					pl_model.get(chancellor-1).detectHitler(false);
-				} else if(fasPolicies >= 5 && rnd.nextFloat() < 0.2) { //if veto is on & it was tried to veto
+				}
+				if(fasPolicies >= 5 && rnd.nextFloat() < 0.2) { //if veto is on & it was tried to veto
 					vetoed = true;
 					if(rnd.nextFloat() > 0.5) { //veto is accepted
 						pl +=",V";
@@ -159,10 +175,12 @@ public class NNTrainer {
 						int c = rnd.nextInt(3);
 						if(cardPile.remove(c) == 1) {
 							pl += ",L";
+							played = 1;
 							supposedLibCards++;
 							libPolicies++;
 						} else {
 							pl += ",F";
+							played = -1;
 							supposedFasCards++;
 							presidentPower = true;
 							fasPolicies++;
@@ -184,10 +202,12 @@ public class NNTrainer {
 					}
 					if(cardPile.remove(c) == 1) {
 						pl += ",L";
+						played = 1;
 						supposedLibCards++;
 						libPolicies++;
 					} else {
 						pl += ",F";
+						played = -1;
 						presidentPower = true;
 						supposedFasCards++;
 						fasPolicies++;
@@ -195,9 +215,9 @@ public class NNTrainer {
 					electionTracker = 0;
 					for(int j = 0; j < 2; j++) {
 						if(cardPile.remove(j) == 1) {
-							libPolicies++;
+							supposedLibCards++;
 						} else {
-							fasPolicies++;
+							supposedFasCards++;
 						}
 					}
 				}
@@ -233,12 +253,18 @@ public class NNTrainer {
 			
 		}
 		
+		if(breakStatus) {
+			return -1;
+		}
 		
 		lastPresident = president;
 		lastChancellor = chancellor;
 		lastPlayed = played; 
 		
-		president = president%5 + 1;
+		do{
+			president = president%5 + 1;
+		} while(pl_model.get(president-1).getDeathStatus());
+		chancellor = 0;
 		
 		int action = 0;
 		
@@ -276,12 +302,16 @@ public class NNTrainer {
 		switch(action) {
 		case 1:
 			inputNN(state, true, false, false, false, false, false, president, chancellor, 0, 0, 0, false);
+			do { //choosing a random chancellor
+				chancellor = rnd.nextInt(5) + 1; 
+			} while(chancellor == president || chancellor == state || pl_model.get(chancellor-1).getDeathStatus());
 			inputNN(state, false, false, false, false, false, true, president, chancellor, 0, 0, 0, false);
 			inputNN(state, false, false, true, false, false, false, president, chancellor, threeCards[0], threeCards[1], threeCards[2], false);
 			if(fasPolicies >= 5 && rnd.nextFloat() >= 0.70) {
 				inputNN(state, false, false, false, false, true, true, president, chancellor, randCard == 0 ? threeCards[1] : threeCards[0], randCard == 0 ? threeCards[2] : (randCard == 1 ? threeCards[2] : threeCards[1]), 0, false);
 			} else {
 				lastPlayed = threeCards[randCardTwo];
+				electionTracker = 0;
 				inputNN(state, false, false, false, false, false, false, president, chancellor, threeCards[0], threeCards[1], threeCards[2], true);
 				if(threeCards[randCardTwo] == -1 && fasPolicies >= 4) {
 					inputNN(state, false, true, false, false, false, false, president, chancellor, 0, 0, 0, false);
@@ -293,6 +323,8 @@ public class NNTrainer {
 			inputNN(state, false, false, true, fasPolicies == 5 ? true : false, false, false, president, chancellor, randCard == 0 ? threeCards[1] : threeCards[0], randCard == 0 ? threeCards[2] : (randCard == 1 ? threeCards[2] : threeCards[1]), 0, false);
 			if(fasPolicies >= 5 && rnd.nextFloat() >= 0.70) {
 			} else {
+				lastPlayed = threeCards[randCardTwo];
+				electionTracker = 0;
 				inputNN(state, false, false, false, false, false, false, president, chancellor, randCard == 0 ? threeCards[1] : threeCards[0], randCard == 0 ? threeCards[2] : (randCard == 1 ? threeCards[2] : threeCards[1]), 0, true);
 			}
 			break;
@@ -302,6 +334,8 @@ public class NNTrainer {
 		default:
 			break;	
 		}
+		
+		return 1;
 		
 	}
 	
@@ -335,11 +369,14 @@ public class NNTrainer {
 		}
 		
 		for(int i = 0; i < 5; i++) {
+			System.out.println(pl_model.get(i).getTrustLevel() + "---" + pl_model.get(i).getTheirTrustLevel());
 			inp[i*4+3] = pl_model.get(i).getTrustLevel(); // trust level
 			inp[i*4+4] = pl_model.get(i).getTheirTrustLevel(); // their trust level
 			inp[i*4+5] = pl_model.get(i).getDeathStatus() ? 0 : 1; // is he dead?
 			inp[i*4+6] = pl_model.get(i).isHeHitler() ? 1 : -1; // is he hitler?
 		}
+		
+		System.out.println(libPolicies + " : " + fasPolicies);
 		
 		inp[23] = otherFascist; //Other Fascist
 		inp[24] = chooseChanc ? 1 : 0;
@@ -367,6 +404,46 @@ public class NNTrainer {
 		inp[46] = electionTracker;
 		inp[47] = tellCards ? 1 : 0;
 		
+		
+		String filePath = "n_weights.txt";
+		
+		String content = null;
+		 try{
+			 content = new String ( Files.readAllBytes( Paths.get(filePath) ) );
+		 }catch (IOException e){
+			 e.printStackTrace();
+		 }
+		 
+		 nn.initialWeights(content);
+//		StringBuilder contentBuilder = new StringBuilder();
+//	    try (BufferedReader br = new BufferedReader(new FileReader(filePath)))
+//	    {
+//	 
+//	        String sCurrentLine;
+//	        while ((sCurrentLine = br.readLine()) != null)
+//	        {
+//	            contentBuilder.append(sCurrentLine).append("\n");
+//	        }
+//	    }
+//	    catch (IOException e)
+//	    {
+//	        e.printStackTrace();
+//	    }
+//	    String content = contentBuilder.toString();
+	    
+//		 String[] val = content.split(",");
+//		 float[] _val = new float[val.length];
+//		 System.out.println(val[1000]);
+//		 for(int i = 0; i < val.length; i++) {
+//			 _val[i] = Float.parseFloat(val[i]);
+//
+//			 System.out.print(_val[i] + ",");
+//		 }
+//
+//		 System.out.println("\n" + _val[1000]);
+//		 nn.initialWeights(content);
+//		
+//		
 		float[] out = nn.calculateNN(inp);
 		
 		for(int i = 0; i < inp.length; i++) {
@@ -378,36 +455,55 @@ public class NNTrainer {
 		for(int i = 0; i < out.length; i++) {
 			System.out.println(out[i]);
 		}
-		Scanner sc = new Scanner(System.in);
+		
 		
 		float[] correctValues = new float[18];
 		
 		for(int i = 0; i < correctValues.length; i++) {
-			correctValues[i] = sc.nextFloat();
+			System.out.print(i + ": ");
+			correctValues[i] = Float.parseFloat(sc.next());
 		}
 		
 		float[] cost = nn.calculateCost(out, correctValues);
 		nn.correctNN(inp, out, correctValues);
 		
+		
+		
+		
 		try(FileWriter fw = new FileWriter("costtable.txt", true);
 	    		BufferedWriter bw = new BufferedWriter(fw);
 	    		PrintWriter out2 = new PrintWriter(bw)) {
-			out2.println(cost);
+			int i = 0;
+			for(i = 0; i < out.length; i++) {
+				out2.println(out[i] + "\t\t" + correctValues[i] + "\t\t" + cost[i]);
+			}
+			out2.println(cost[i]);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
-		try(FileWriter fw = new FileWriter("n_weights.txt", true);
-	    		BufferedWriter bw = new BufferedWriter(fw);
-	    		PrintWriter out2 = new PrintWriter(bw)) {
-			out2.println(nn.readBrain());
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		
-		sc.close();
+		File myFoo = new File("n_weights.txt");
+		FileWriter fooWriter;
+		try {
+			fooWriter = new FileWriter(myFoo, false);
+			fooWriter.write(nn.readBrain());
+			fooWriter.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // true to append
+		                                                     // false to overwrite.
+		
+//		try(FileWriter fw = new FileWriter("n_weights.txt", true);
+//	    		BufferedWriter bw = new BufferedWriter(fw);
+//	    		PrintWriter out2 = new PrintWriter(bw)) {
+//			out2.println(nn.readBrain());
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 		
 	}
 	
@@ -445,7 +541,14 @@ public class NNTrainer {
 	
 	private void checkPlays(String _play, int me) {
 		String[] play = _play.split(",");
+		for(int i = 0; i < play.length; i++) {
+			System.out.print(play[i] + ", ");
+		}
+		if(play.length > 3) {
+			System.out.println("\n" + play[3]);
+		}
 		
+		System.out.println("\n\n");
 		int _pres = Integer.parseInt(play[0]);
 		int _chanc = Integer.parseInt(play[1]);
 		

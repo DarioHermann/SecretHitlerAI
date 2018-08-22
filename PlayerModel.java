@@ -9,7 +9,7 @@ public class PlayerModel {
 	private LinkedList<String> moves;
 	
 	public PlayerModel() {
-		trustLevel = 0;
+		trustLevel = 0.1f;
 		theirTrustLevel = 0;
 		isHitler = true;
 		isDead = false;
@@ -25,40 +25,42 @@ public class PlayerModel {
 	}
 	
 	public void increaseTrust() {
-		if(theirTrustLevel > 1) {
-			theirTrustLevel = ((-1/10)* (theirTrustLevel * theirTrustLevel) + 2 * theirTrustLevel - (1/15)); // (-1/10)x^2 + 2x - 1/15
+		if(trustLevel > 1) {
+			trustLevel = ((-1/10)* (trustLevel * trustLevel) + 2 * trustLevel - (1/15)); // (-1/10)x^2 + 2x - 1/15
 		}
-		else if (theirTrustLevel < -1) {
-			theirTrustLevel *= (2/3);
+		else if (trustLevel < -1) {
+			trustLevel *= (2/3);
 		}
-		else if(theirTrustLevel > 0) {
-			theirTrustLevel *= 2;
+		else if(trustLevel > 0) {
+			trustLevel *= 4;
 		}
-		else if(theirTrustLevel < 0) {
-			theirTrustLevel = (float) ((theirTrustLevel/2)+0.2);
+		else if(trustLevel < 0) {
+			trustLevel = (float) ((trustLevel/4)+0.2);
 		}
 		else {
-			theirTrustLevel += 0.1;
+			trustLevel += 0.1;
 		}
+		System.out.println(trustLevel);
 	}
 	
 	public void decreaseTrust() {
-		if(theirTrustLevel > 1) {
-			theirTrustLevel *= (2/3);
+		if(trustLevel > 1) {
+			trustLevel *= (2/3);
 		}
-		else if(theirTrustLevel < -1) {
-			theirTrustLevel = ((-3/2) * (theirTrustLevel * theirTrustLevel) - 5 * theirTrustLevel - (11/2));
-			theirTrustLevel -= 0.5;
+		else if(trustLevel < -1) {
+			trustLevel = ((-3/2) * (trustLevel * trustLevel) - 5 * trustLevel - (11/2));
+			trustLevel -= 0.5;
 		}
-		else if(theirTrustLevel > 0) {
-			theirTrustLevel = (float) ((theirTrustLevel/2) + 0.2);
+		else if(trustLevel > 0) {
+			trustLevel = (float) ((trustLevel/4) - 0.2);
 		}
-		else if(theirTrustLevel < 0) {
-			theirTrustLevel *= 2;
+		else if(trustLevel < 0) {
+			trustLevel *= 4;
 		}
 		else {
-			theirTrustLevel -= 0.1;
+			trustLevel -= 0.1;
 		}
+		System.out.println(trustLevel);
 	}
 	
 	public void setTrustLevel(float trust) {
@@ -89,7 +91,7 @@ public class PlayerModel {
 			theirTrustLevel *= (2/3);
 		}
 		else if(theirTrustLevel > 0) {
-			theirTrustLevel *= 2;
+			theirTrustLevel *= 4;
 		}
 		else if(theirTrustLevel < 0) {
 			theirTrustLevel = (float) ((theirTrustLevel/2)+0.2);
@@ -111,7 +113,7 @@ public class PlayerModel {
 			theirTrustLevel = (float) ((theirTrustLevel/2) + 0.2);
 		}
 		else if(theirTrustLevel < 0) {
-			theirTrustLevel *= 2;
+			theirTrustLevel *= 4;
 		}
 		else {
 			theirTrustLevel -= 0.1;

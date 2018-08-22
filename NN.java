@@ -62,7 +62,7 @@ public class NN {
 	}
 	
 	public void initialWeights(String s) {
-		float[] w = new float[weightCount()];
+		float[] w = new float[2028];
 		
 		String[] new_s = s.split(",");
 		for(int i = 0; i < w.length; i++) {
@@ -77,7 +77,7 @@ public class NN {
 		}
 		
 		for(int i = 0; i < outputW.length; i++) {
-			for(int j = 0; j < outputW[i].length; i++) {
+			for(int j = 0; j < outputW[i].length; j++) {
 				outputW[i][j] = w[(hiddenLayer.length * (inputs+1)) + (i * outputW[i].length) + i + j];
 			}
 			outputB[i] = w[(hiddenLayer.length * (inputs+1)) + (outputW[i].length * (i+1)) + i];
@@ -94,7 +94,7 @@ public class NN {
 		
 		float[] output = new float[18];
 		for(int i = 0; i < 18; i++) {
-			output[i] = softSign(sum(outputW[i], hiddenLayer) + outputB[i]);
+			output[i] = softSign(reLU(sum(outputW[i], hiddenLayer) + outputB[i]));
 		}
 		
 		return output;
@@ -129,7 +129,11 @@ public class NN {
 			for(int j = 0; j < outputW[i].length; j++) {
 				dna += outputW[i][j] + ",";
 			}
-			dna += outputB[i];
+			if(i == outputW.length - 1) {
+				dna += outputB[i];
+			} else {
+				dna += outputB[i] + ",";
+			}
 		}
 		
 		return dna;
@@ -140,6 +144,7 @@ public class NN {
 		String[] dna = s.split(",");
 		float[] float_dna = new float[dna.length];
 		for(int i = 0; i < dna.length; i++) {
+			System.out.println(dna[i]);
 			float_dna[i] = Float.parseFloat(dna[i]);
 		}
 		
@@ -201,6 +206,7 @@ public class NN {
 			for(int j = 0; j < outputW.length; j++) {
 				derValue[i] += totrespectout[i][j] * outputW[j][i];
 			}
+			
 			derValue[i] = derValue[i] * (hiddenLayer[i] * (1-hiddenLayer[i]));
 		}
 		
@@ -211,6 +217,7 @@ public class NN {
 				newVals[i][j] = derValue[i] * inp[j];
 			}
 		}
+		
 		
 		for(int i = 0; i < hiddenLayerW.length; i++) {
 			for(int j = 0; j < hiddenLayerW[i].length; j++) {
