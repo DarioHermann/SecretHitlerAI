@@ -140,4 +140,9 @@ public class Player {
 	public void checkPlay(String play) {
 		
 	}
+
+	public float getTotalCost() {
+		// TODO Auto-generated method stub
+		return -1;
+	}
 }

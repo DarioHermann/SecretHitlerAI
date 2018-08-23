@@ -446,7 +446,38 @@ public class NNTrainer {
 //		
 		float[] out = nn.calculateNN(inp);
 		
+		int counter = 0;
+		
 		for(int i = 0; i < inp.length; i++) {
+			if(i == 3 || i == 7 || i == 11 || i == 15 || i == 19 || i == 23 || i == 24 || i == 30 || i == 35 || i == 41 || i == 44 || i == 46) {
+				System.out.println("\n");
+				if(counter == 0) {
+					System.out.println("PLAYER 1:");
+				} else if(counter == 1) {
+					System.out.println("PLAYER 2:");
+				} else if(counter == 2) {
+					System.out.println("PLAYER 3:");
+				} else if(counter == 3) {
+					System.out.println("PLAYER 4:");
+				} else if(counter == 4) {
+					System.out.println("PLAYER 5:");
+				} else if(counter == 5) {
+					System.out.println("OTHER FASCIST:");
+				} else if(counter == 6) {
+					System.out.println("ACTION TO MAKE:");
+				} else if(counter == 7) {
+					System.out.println("PRESIDENCY:");
+				} else if(counter == 8) {
+					System.out.println("POLICIES:");
+				} else if(counter == 9) {
+					System.out.println("CARDS:");
+				} else if(counter == 10) {
+					System.out.println("AM I PRESIDENT OR CHANCELLOR?:");
+				} else {
+					System.out.println("TRACKER AND ADMIT CARDS:");
+				}
+				counter++;
+			}
 			System.out.println(inp[i]);
 		}
 		
@@ -463,6 +494,19 @@ public class NNTrainer {
 			System.out.print(i + ": ");
 			correctValues[i] = Float.parseFloat(sc.next());
 		}
+		
+//		float totCost = 0;
+//		for(int i = 0; i < out.length; i++) {
+//			totCost += out[i];
+//		}
+//		if(totCost < 0.1) {
+//			for(int i = 0; i < out.length; i++) {
+//				if(rnd.nextFloat() >= 0.5) {
+//					out[i] = rnd.nextFloat();
+//				}
+//			}
+//		}
+		
 		
 		float[] cost = nn.calculateCost(out, correctValues);
 		nn.correctNN(inp, out, correctValues);
