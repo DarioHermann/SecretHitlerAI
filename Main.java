@@ -23,6 +23,9 @@ public class Main {
 		ArrayList<Integer> fascists_two = new ArrayList<Integer>();
 		ArrayList<Integer> fascists_three = new ArrayList<Integer>();
 		ArrayList<Integer> fascists_four = new ArrayList<Integer>();
+		int victory;
+		float[] fitness = new float[20];
+		int[] positions = new int[20];
 		
 		for(int i =0; i < 2; i++) {
 			fascists.add(-1);
@@ -38,7 +41,7 @@ public class Main {
 		}
 		
 		String[] values = new String[20];
-		String filePath = "weights3.txt";
+		String filePath = "weights4.txt";
 			
 		String content = null;
 		try{
@@ -67,142 +70,304 @@ public class Main {
 //			e1.printStackTrace();
 //		}
 		
-		for(int i = 0; i < 5; i++) {
-			//RandomBot n_player = new RandomBot(roles.get(i), i);
-			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i));
-			players.add(n_player);
-			if(roles.get(i).equals("Hitler")) {
-				fascists.set(1, i+1);
-			} else if(roles.get(i).equals("Fascist")) {
-				fascists.set(0, i+1);
-			}
-		}
-//		
-//		/*GameRun game = new GameRun(players);*/
-//		
-		/*ArrayList<String> showRoles = new ArrayList<String>();
-		showRoles = secretHitler.showRole(players);
-		printRoles(showRoles);*/
-		secretHitler.makePlayersState(players);
-		for(int i = 0; i < 5; i++) {
-			players.get(i).receiveRole(fascists);
-		}
-		secretHitler.start();
 		
-		//--------------------------------------------------------
+		//---------------------------------------------------1
+		
+//		System.out.println(roles);
+//		for(int i = 0; i < 5; i++) {
+//			//RandomBot n_player = new RandomBot(roles.get(i), i);
+//			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i));
+//			players.add(n_player);
+//			if(roles.get(i).equals("Hitler")) {
+//				fascists.set(1, i+1);
+//			} else if(roles.get(i).equals("Fascist")) {
+//				fascists.set(0, i+1);
+//			}
+//		}
+//		
+//		secretHitler.makePlayersState(players);
+//		for(int i = 0; i < 5; i++) {
+//			players.get(i).receiveRole(fascists);
+//		}
+//		victory = secretHitler.start();
+//		
+//		if(victory == 1 ) { //LIBERALS WIN
+//			for(int i = 0; i < 5; i++) {
+//				if(roles.get(i).equals("Liberal")) {
+//					players.get(i).didIWin(true);
+//				} else {
+//					players.get(i).didIWin(false);
+//				}
+//			}
+//		} else {
+//			for(int i = 0; i < 5; i++) {
+//				if(roles.get(i).equals("Liberal")) {
+//					players.get(i).didIWin(false);
+//				} else {
+//					players.get(i).didIWin(true);
+//				}
+//			}
+//		}
+		
+		//--------------------------------------------------------2
+		
+//		Collections.shuffle(roles);
+//		System.out.println(roles);
+//		for(int i = 0; i < 5; i++) {
+//			//RandomBot n_player = new RandomBot(roles.get(i), i);
+//			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+5));
+//			players_two.add(n_player);
+//			if(roles.get(i).equals("Hitler")) {
+//				fascists_two.set(1, i+1);
+//			} else if(roles.get(i).equals("Fascist")) {
+//				fascists_two.set(0, i+1);
+//			}
+//		}
+//		
+//		secretHitler_two.makePlayersState(players_two);
+//		for(int i = 0; i < 5; i++) {
+//			players_two.get(i).receiveRole(fascists_two);
+//		}
+//		victory = secretHitler_two.start();
+//		
+//		if(victory == 1 ) { //LIBERALS WIN
+//			for(int i = 0; i < 5; i++) {
+//				if(roles.get(i).equals("Liberal")) {
+//					players_two.get(i).didIWin(true);
+//				} else {
+//					players_two.get(i).didIWin(false);
+//				}
+//			}
+//		} else {
+//			for(int i = 0; i < 5; i++) {
+//				if(roles.get(i).equals("Liberal")) {
+//					players_two.get(i).didIWin(false);
+//				} else {
+//					players_two.get(i).didIWin(true);
+//				}
+//			}
+//		}
+		
+		//--------------------------------------------------------3
 		
 		Collections.shuffle(roles);
-		
-		for(int i = 0; i < 5; i++) {
-			//RandomBot n_player = new RandomBot(roles.get(i), i);
-			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+5));
-			players_two.add(n_player);
-			if(roles.get(i).equals("Hitler")) {
-				fascists_two.set(1, i+1);
-			} else if(roles.get(i).equals("Fascist")) {
-				fascists_two.set(0, i+1);
-			}
-		}
-		
-		secretHitler_two.makePlayersState(players_two);
-		for(int i = 0; i < 5; i++) {
-			players_two.get(i).receiveRole(fascists_two);
-		}
-		secretHitler_two.start();
-		
-		
-		//--------------------------------------------------------
-		
-		Collections.shuffle(roles);
-				
+		System.out.println(roles);		
 		for(int i = 0; i < 5; i++) {
 			//RandomBot n_player = new RandomBot(roles.get(i), i);
 			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+10));
-			players_two.add(n_player);
+			players_three.add(n_player);
 			if(roles.get(i).equals("Hitler")) {
-				fascists_two.set(1, i+1);
+				fascists_three.set(1, i+1);
 			} else if(roles.get(i).equals("Fascist")) {
-				fascists_two.set(0, i+1);
+				fascists_three.set(0, i+1);
 			}
 		}
 				
-		secretHitler_two.makePlayersState(players_two);
+		secretHitler_three.makePlayersState(players_three);
 		for(int i = 0; i < 5; i++) {
-			players_two.get(i).receiveRole(fascists_two);
+			players_three.get(i).receiveRole(fascists_three);
 		}
-		secretHitler_two.start();
-				
-				
-		//--------------------------------------------------------
-				
-		Collections.shuffle(roles);
-				
-		for(int i = 0; i < 5; i++) {
-			//RandomBot n_player = new RandomBot(roles.get(i), i);
-			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+15));
-			players_two.add(n_player);
-			if(roles.get(i).equals("Hitler")) {
-				fascists_two.set(1, i+1);
-			} else if(roles.get(i).equals("Fascist")) {
-				fascists_two.set(0, i+1);
+		victory = secretHitler_three.start();
+		
+		if(victory == 1 ) { //LIBERALS WIN
+			for(int i = 0; i < 5; i++) {
+				if(roles.get(i).equals("Liberal")) {
+					players_three.get(i).didIWin(true);
+				} else {
+					players_three.get(i).didIWin(false);
+				}
 			}
-		}
-				
-		secretHitler_two.makePlayersState(players_two);
-		for(int i = 0; i < 5; i++) {
-			players_two.get(i).receiveRole(fascists_two);
-		}
-		secretHitler_two.start();
-		
-		
-		float[] fitness = new float[20];
-		int[] positions = new int[20];
-		
-		for(int i = 0; i < 5; i++) {
-			positions[i] = i;
-			fitness[i] = players.get(i).getTotalCost();
-			positions[i+5] = i+5;
-			fitness[i+5] = players_two.get(i).getTotalCost();
-			positions[i+10] = i+10;
-			fitness[i+10] = players_three.get(i).getTotalCost();
-			positions[i+15] = i+15;
-			fitness[i+15] = players_four.get(i).getTotalCost();
-		}
-		
-		for(int i = 0; i < 19; i++) {
-			for(int j = 0; j < 19 - i; j++) {
-				if(fitness[j] > fitness[j+1]) {
-					float x = fitness[j];
-					fitness[j] = fitness[j+1];
-					fitness[j+1] = x;
-					
-					int y = positions[j];
-					positions[j] = positions[j+1];
-					positions[j+1] = y;
+		} else {
+			for(int i = 0; i < 5; i++) {
+				if(roles.get(i).equals("Liberal")) {
+					players_three.get(i).didIWin(false);
+				} else {
+					players_three.get(i).didIWin(true);
 				}
 			}
 		}
 				
-		float[][] survivors = new float[4][];
-		for(int i = 0; i < 4; i++) {
-			survivors[i] = neuralNetworks.get(positions[i]).getBrain();
+				
+		//--------------------------------------------------------4
+				
+//		Collections.shuffle(roles);
+//		System.out.println(roles);		
+//		for(int i = 0; i < 5; i++) {
+//			//RandomBot n_player = new RandomBot(roles.get(i), i);
+//			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+15));
+//			players_four.add(n_player);
+//			if(roles.get(i).equals("Hitler")) {
+//				fascists_four.set(1, i+1);
+//			} else if(roles.get(i).equals("Fascist")) {
+//				fascists_four.set(0, i+1);
+//			}
+//		}
+//				
+//		secretHitler_four.makePlayersState(players_four);
+//		for(int i = 0; i < 5; i++) {
+//			players_four.get(i).receiveRole(fascists_four);
+//		}
+//		victory = secretHitler_four.start();
+//		
+//		if(victory == 1 ) { //LIBERALS WIN
+//			for(int i = 0; i < 5; i++) {
+//				if(roles.get(i).equals("Liberal")) {
+//					players_four.get(i).didIWin(true);
+//				} else {
+//					players_four.get(i).didIWin(false);
+//				}
+//			}
+//		} else {
+//			for(int i = 0; i < 5; i++) {
+//				if(roles.get(i).equals("Liberal")) {
+//					players_four.get(i).didIWin(false);
+//				} else {
+//					players_four.get(i).didIWin(true);
+//				}
+//			}
+//		}
+		
+		//----------------------------------------------------------
+		
+		
+		
+		for(int i = 0; i < 5; i++) {
+			positions[i] = i;
+//			fitness[i] = players.get(i).getTotalCost();
+			positions[i+5] = i+5;
+//			fitness[i+5] = players_two.get(i).getTotalCost();
+			positions[i+10] = i+10;
+			fitness[i+10] = players_three.get(i).getTotalCost();
+			positions[i+15] = i+15;
+//			fitness[i+15] = players_four.get(i).getTotalCost();
 		}
 		
-		GeneticAlgorithms ga = new GeneticAlgorithms(survivors);
 		
-		ga.generateChildren();
-		String[] newGeneration = ga.getNew_Gen_String();
+		//----------------------------------------------------------1
+//		
+//		try(FileWriter fw = new FileWriter("fitnesses1.txt", false);
+//				BufferedWriter bw = new BufferedWriter(fw);
+//				PrintWriter out = new PrintWriter(bw)) {
+//			for(int i = 0; i < 5; i++) {
+//				out.println(fitness[i]);
+//			}
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 		
-		try(FileWriter fw = new FileWriter("weights4.txt", false);
+		//-----------------------------------------------2
+		
+//		String n_filePath = "fitnesses1.txt";
+//		
+//		String n_content = null;
+//		try{
+//			n_content = new String ( Files.readAllBytes( Paths.get(n_filePath) ) );
+//		}catch (IOException e){
+//			e.printStackTrace();
+//		}
+//		
+//		try(FileWriter fw = new FileWriter("fitnesses2.txt", false);
+//				BufferedWriter bw = new BufferedWriter(fw);
+//				PrintWriter out = new PrintWriter(bw)) {
+//			out.println(n_content);
+//			for(int i = 5; i < 10; i++) {
+//				out.println(fitness[i]);
+//			}
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
+		//-----------------------------------------------3
+		
+		String n_filePath = "fitnesses2.txt";
+				
+		String n_content = null;
+		try{
+			n_content = new String ( Files.readAllBytes( Paths.get(n_filePath) ) );
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		
+		try(FileWriter fw = new FileWriter("fitnesses3.txt", false);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
-			for(int i = 0; i < newGeneration.length; i++) {
-				out.println(newGeneration[i]);
+			out.println(n_content);
+			for(int i = 10; i < 15; i++) {
+				out.println(fitness[i]);
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
+		//-----------------------------------------------4
+		
+//		String n_filePath = "fitnesses3.txt";
+//		
+//		String n_content = null;
+//		try{
+//			n_content = new String ( Files.readAllBytes( Paths.get(n_filePath) ) );
+//		}catch (IOException e){
+//			e.printStackTrace();
+//		}
+//		
+//		
+//		
+//		String[] _cont = n_content.split("\\r?\\n");
+//
+//		for(int i = 0; i < 15; i++) {
+//			fitness[i] = Float.parseFloat(_cont[i]);
+//		}
+//		
+//		
+//		try(FileWriter fw = new FileWriter("fitnesses4.txt", false);
+//				BufferedWriter bw = new BufferedWriter(fw);
+//				PrintWriter out = new PrintWriter(bw)) {
+//			for(int i = 0; i < 20; i++) {
+//				out.println(i + "\t\t" + fitness[i]);
+//			}
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		
+//		
+//		for(int i = 0; i < 19; i++) {
+//			for(int j = 0; j < 19 - i; j++) {
+//				if(fitness[j] > fitness[j+1]) {
+//					float x = fitness[j];
+//					fitness[j] = fitness[j+1];
+//					fitness[j+1] = x;
+//					
+//					int y = positions[j];
+//					positions[j] = positions[j+1];
+//					positions[j+1] = y;
+//				}
+//			}
+//		}
+//				
+//		float[][] survivors = new float[4][];
+//		for(int i = 0; i < 4; i++) {
+//			survivors[i] = neuralNetworks.get(positions[i]).getBrain();
+//		}
+//		
+//		GeneticAlgorithms ga = new GeneticAlgorithms(survivors);
+//		
+//		ga.generateChildren();
+//		String[] newGeneration = ga.getNew_Gen_String();
+//		
+//		try(FileWriter fw = new FileWriter("weights5.txt", false);
+//				BufferedWriter bw = new BufferedWriter(fw);
+//				PrintWriter out = new PrintWriter(bw)) {
+//			for(int i = 0; i < newGeneration.length; i++) {
+//				out.println(newGeneration[i]);
+//			}
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 		
 		
 		/*

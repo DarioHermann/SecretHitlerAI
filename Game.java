@@ -2,13 +2,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Game {
-	static protected ArrayList<Player> players;
-	static protected ArrayList<Integer> playersState = new ArrayList<Integer>();
-	static protected ArrayList<String> policiesDeck = new ArrayList<String>();
-	static protected ArrayList<String> roles = new ArrayList<String>();
-	static protected int libPolicies;
-	static protected int fasPolicies;
-	static protected int electionTracker;
+	protected ArrayList<Player> players;
+	protected ArrayList<Integer> playersState = new ArrayList<Integer>();
+	protected ArrayList<String> policiesDeck = new ArrayList<String>();
+	protected ArrayList<String> roles = new ArrayList<String>();
+	protected int libPolicies;
+	protected int fasPolicies;
+	protected int electionTracker;
 	
 	public Game() {
 		
@@ -25,10 +25,11 @@ public class Game {
 			Collections.shuffle(roles);
 		}
 		Collections.shuffle(roles);
-		System.out.println(roles);
+		//System.out.println(roles);
 	}
 	
-	public void start() {
+	public int start() {
+		return -1;
 	}
 	
 	protected void shuffleCards() {

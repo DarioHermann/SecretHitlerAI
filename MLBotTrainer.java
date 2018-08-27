@@ -22,8 +22,10 @@ public class MLBotTrainer extends Player{
 	private int supposedFasCards;
 	private int electionTracker;
 	private int[] threeCards;
+	private boolean saw3Cards;
 	
 	private float totalCost;
+	private boolean won;
 	private int choices;
 	
 	
@@ -46,6 +48,8 @@ public class MLBotTrainer extends Player{
 		typeOfPlayer = 1;
 		totalCost = 0;
 		choices = 0;
+		won = false;
+		saw3Cards = false;
 		this.nn = nn;
 		//nn = new NN(48, 30);
 //		numLibCards = 6;
@@ -73,22 +77,29 @@ public class MLBotTrainer extends Player{
 			otherPlayers.add(new PlayerModel());
 		}
 		
-		int x = 48*30 + 30 + 30*18 + 18;
-		
-		float[] weights = new float[x];
-		
-		for(int i = 0; i < x; i++) {
-			weights[i] = rnd.nextFloat()*8 - 4;
-		}
-		
-		nn.initialWeights(weights);
-		
+//		int x = 48*30 + 30 + 30*18 + 18;
+//		
+//		float[] weights = new float[x];
+//		
+//		for(int i = 0; i < x; i++) {
+//			weights[i] = rnd.nextFloat()*8 - 4;
+//		}
+//		
+//		nn.initialWeights(weights);
+//		
 	}
 	
-	
+	public void didIWin(boolean v) {
+		won = v;
+	}
 	
 	public float getTotalCost() {
 		totalCost = totalCost / choices;
+		if(won) {
+			totalCost -= 0.5;
+		} else {
+			totalCost += 0.5;
+		}
 		return totalCost;
 	}
 	
@@ -100,7 +111,7 @@ public class MLBotTrainer extends Player{
 				otherPlayers.get(i).detectHitler(false);
 			}
 			otherPlayers.get(otherFascist-1).setRole("Fascist");
-			otherPlayers.get(otherFascist-1).setTrustLevel(10.0f);
+			otherPlayers.get(otherFascist-1).setTrustLevel(2.0f);
 			otherPlayers.get(state-1).detectHitler(true);
 		} else if(role.equals("Fascist")) {
 			otherFascist = showRoles.get(1);
@@ -109,7 +120,7 @@ public class MLBotTrainer extends Player{
 				otherPlayers.get(i).detectHitler(false);
 			}
 			otherPlayers.get(otherFascist-1).setRole("Hitler");
-			otherPlayers.get(otherFascist-1).setTrustLevel(10.0f);
+			otherPlayers.get(otherFascist-1).setTrustLevel(2.0f);
 			otherPlayers.get(otherFascist-1).detectHitler(true);
 		} else {
 			otherFascist = 0;
@@ -175,8 +186,14 @@ public class MLBotTrainer extends Player{
 		return output;
 	}
 	
+	public void isNotHitler(int chancellor) {
+		otherPlayers.get(chancellor-1).detectHitler(false);
+		
+	}
+	
 	private void analyzePlay(float[] inps, float[] out) {
 		int counter = 0;
+		choices++;
 		
 		for(int i = 0; i < inps.length; i++) {
 			if(i == 3 || i == 7 || i == 11 || i == 15 || i == 19 || i == 23 || i == 24 || i == 30 || i == 35 || i == 41 || i == 44 || i == 46) {
@@ -222,10 +239,29 @@ public class MLBotTrainer extends Player{
 		
 		float[] correctValues = new float[18];
 		
+		System.out.print("How Many choices: ");
+		int howMany = sc.nextInt();
+		
+		int[] pos = new int[howMany];
+		
 		for(int i = 0; i < correctValues.length; i++) {
-			System.out.print(i + ": ");
-			correctValues[i] = Float.parseFloat(sc.next());
+			correctValues[i] = 0;
 		}
+		for(int i = 0; i < howMany; i++) {
+			do{
+				System.out.print("Value " + (i+1) + ": ");
+				pos[i] = sc.nextInt();
+			} while(pos[i] > 17);
+		}
+		
+		for(int i = 0; i < howMany; i++) {
+			correctValues[pos[i]] += (float) (1.0/howMany);
+		}
+		
+//		for(int i = 0; i < correctValues.length; i++) {
+//			System.out.print(i + ": ");
+//			correctValues[i] = Float.parseFloat(sc.next());
+//		}
 		
 		float[] cost = nn.calculateCost(out, correctValues);
 		
@@ -234,9 +270,13 @@ public class MLBotTrainer extends Player{
 	    		PrintWriter out2 = new PrintWriter(bw)) {
 			int i = 0;
 			for(i = 0; i < out.length; i++) {
-				out2.println(out[i] + "\t\t" + correctValues[i] + "\t\t" + cost[i]);
+				if(i==0) {
+					out2.println(out[i] + "\t\t" + correctValues[i] + "\t\t" + cost[i] + "\t\t" + cost[cost.length-1]);
+				} else {
+					out2.println(out[i] + "\t\t" + correctValues[i] + "\t\t" + cost[i]);
+				}
 			}
-			out2.println(cost[i]);
+			out2.println("\n");
 			totalCost += cost[i];
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -245,9 +285,11 @@ public class MLBotTrainer extends Player{
 	}
 	
 	public int chooseChancellor(int president, int lastChancellor, ArrayList<Integer> players) {
+		pres = president;
+		chanc = 0;
 		ArrayList<Integer> pls = new ArrayList<Integer>(players);
 		pls.remove((Object) president);
-		pls.remove((Object) lastChancellor);
+		pls.remove((Object) lastChanc);
 		float[] out = inputNN(true, false, true, false, false, false, false, false, 0, 0, 0, false);
 		int[] choose = new int[5];
 		for(int i = 0; i < 5; i++) {
@@ -275,6 +317,8 @@ public class MLBotTrainer extends Player{
 	}
 	
 	public String vote(int president, int chancellor) {
+		pres = president;
+		chanc = chancellor;
 		float[] out = inputNN(state == president? true : false, state == chancellor? true : false, false, false, false, false, false, true, 0, 0, 0, false);
 		
 		if(out[5] >= out[6]) {
@@ -292,8 +336,14 @@ public class MLBotTrainer extends Player{
 		pol[1] = two;
 		pol[2] = three;
 		for(int i = 0; i < 3; i++) {
-			_pol[i] = pol[i].equals("Liberal") ? 1 : -1; 
+			_pol[i] = pol[i].equals("Liberal") ? 1 : -1;
+			if(_pol[i] == 1) {
+				supposedLibCards++;
+			} else {
+				supposedFasCards++;
+			}
 		}
+		
 		
 		float[] out = inputNN(true, false, false, false, true, false, false, false, _pol[0], _pol[1], _pol[2], false);
 		
@@ -326,7 +376,7 @@ public class MLBotTrainer extends Player{
 		pol[1] = two;
 		
 		for(int i = 0; i < 2; i++) {
-			_pol[i] = pol[0].equals("Liberal") ? 1 : -1;
+			_pol[i] = pol[i].equals("Liberal") ? 1 : -1;
 		}
 		
 		float[] out = inputNN(false, true, false, false, true, false, veto, false, _pol[0], _pol[1], 0, false);
@@ -355,6 +405,18 @@ public class MLBotTrainer extends Player{
 		if(numbs[0] == 2 && !veto) {
 			return numbs[1];
 		} else {
+			if(veto) {
+				if(_pol[0] == 1) {
+					supposedLibCards++;
+				} else {
+					supposedFasCards++;
+				}
+				if(_pol[1] == 1) {
+					supposedLibCards++;
+				} else {
+					supposedFasCards++;
+				}
+			}
 			return numbs[0];
 		}
 	}
@@ -407,16 +469,12 @@ public class MLBotTrainer extends Player{
 		return numbs[0];
 	}
 	
-	public String tellCards(String one, String two, String three) {
+	public String tellCards(int one, int two, int three, int enacted) {
+		lastPlayed = enacted;
 		int _pol[] = new int[3];
-		String pol[] = new String[3];
-		pol[0] = one;
-		pol[1] = two;
-		pol[2] = three;
-		
-		for(int i = 0; i < 3; i++) {
-			_pol[i] = pol[0].equals("Liberal") ? 1 : -1;
-		}
+		_pol[0] = one;
+		_pol[1] = two;
+		_pol[2] = three;
 		
 		float[] out = inputNN(true, false, false, false, false, false, false, false, _pol[0], _pol[1], _pol[2], true);
 		
@@ -446,19 +504,17 @@ public class MLBotTrainer extends Player{
 		results[2] = "1 Liberal 2 Fascists";
 		results[3] = "0 Liberals 3 Fascists";
 		
+		
+		
 		return results[choose[0]];
 	}
 	
 	
-	public String tellCards(String one, String two) {
+	public String tellCards(int one, int two, int enacted) {
+		lastPlayed = enacted;
 		int[] _pol = new int[2];
-		String[] pol = new String[2];
-		pol[0] = one;
-		pol[1] = two;
-		
-		for(int i = 0; i < 2; i++) {
-			_pol[i] = pol[i].equals("Liberal") ? 1 : -1;
-		}
+		_pol[0] = one;
+		_pol[1] = two;
 		
 		float[] out = inputNN(false, true, false, false, false, false, false, false, _pol[0], _pol[1], 0, true);
 		
@@ -489,7 +545,188 @@ public class MLBotTrainer extends Player{
 		return results[choose[0]];
 	}
 	
+	public void cardsTold(int president, int chancellor, String toldP, String toldC) {
+		System.out.println("I'm fucking a sheep\nPresident: " + toldP);
+		System.out.println("Chancellor: " + toldC);
+		String[] linesP = toldP.split(" ");
+		String[] linesC = toldC.split(" ");
+		int libsP = Integer.parseInt(linesP[0]);
+		int fasP = Integer.parseInt(linesP[2]);
+		int libsC = Integer.parseInt(linesC[0]);
+		int fasC = Integer.parseInt(linesC[2]);
+		
+		supposedLibCards += libsP;
+		supposedFasCards += fasP;
+		
+		if(saw3Cards) {
+			int libers = 0;
+			int fascer = 0;
+			for(int i = 0; i < 3; i++) {
+				if(threeCards[i] == 1) {
+					supposedLibCards++;
+					libers++;
+				} else {
+					supposedFasCards++;
+					fascer++;
+				}
+			}
+			if(libers != libsP && role.equals("Liberal")) {
+				otherPlayers.get(president-1).decreaseTrust();
+				otherPlayers.get(president-1).decreaseTrust();
+				otherPlayers.get(president-1).decreaseTrust();
+			}
+			if(!((libers == libsC && fascer == fasC+1) || (libers == libsC+1 && fascer == fasC))) {
+				if(role.equals("Liberal")) {
+					otherPlayers.get(chancellor-1).decreaseTrust();
+					otherPlayers.get(chancellor-1).decreaseTrust();
+					otherPlayers.get(chancellor-1).decreaseTrust();
+				}
+			}
+			saw3Cards = false;
+		} else {
+			if((libsP == libsC && fasP == fasC+1)||(libsP == libsC+1 && fasP == fasC)) {
+			
+			} else {
+				otherPlayers.get(president-1).decreaseTrust();
+				otherPlayers.get(chancellor-1).decreaseTrust();
+			}
+		}
+		
+	}
+	
+	public void cardsTold(int president, String toldP, String toldC, int cardOne, int cardTwo) {
+		System.out.println("I'm fucking Chancellor\nPresident: " + toldP);
+		System.out.println("Chancellor: " + toldC);
+		String[] linesP = toldP.split(" ");
+		String[] linesC = toldC.split(" ");
+		int libsP = Integer.parseInt(linesP[0]);
+		int fasP = Integer.parseInt(linesP[2]);
+		int libC = Integer.parseInt(linesC[0]);
+		int faC = Integer.parseInt(linesC[2]);
+		
+		int libsC = 0;
+		int fasC = 0;
+		
+		if(cardOne == 1) {
+			libsC++;
+		} else {
+			fasC++;
+		}
+		if(cardTwo == 1) {
+			libsC++;
+		} else {
+			fasC++;
+		}
+		
+		
+		if(saw3Cards) {
+			int libers = 0;
+			int fascer = 0;
+			for(int i = 0; i < 3; i++) {
+				if(threeCards[i] == 1) {
+					supposedLibCards++;
+					libers++;
+				} else {
+					supposedFasCards++;
+					fascer++;
+				}
+				if(libers != libsP && role.equals("Liberal")) {
+					otherPlayers.get(president-1).decreaseTrust();
+					otherPlayers.get(president-1).decreaseTrust();
+					otherPlayers.get(president-1).decreaseTrust();
+				}
+			}
+			saw3Cards = false;
+		} else {
+			if((libsP == libsC && fasP == fasC+1)|| (libsP == libsC+1 && fasP == libsC)) {
+				supposedLibCards += libsP;
+				supposedFasCards += fasP;
+				if (!((libsP == libC && fasP == faC+1) || (libsP == libC+1 && fasP == faC))) {
+					for(int i = 0; i < 5; i++) {
+						if(i != state-1) {
+							otherPlayers.get(i).decreaseTheirTrust();
+							otherPlayers.get(i).decreaseTheirTrust();
+						}
+					}
+				}
+			} else if ((libsP == libC && fasP == faC+1) || (libsP == libC+1 && fasP == faC)){
+				otherPlayers.get(president-1).increaseTrust();
+				otherPlayers.get(president-1).increaseTrust();
+				supposedLibCards += libsC;
+				supposedFasCards += fasC+1;
+			}else {
+				otherPlayers.get(president-1).decreaseTrust();
+				otherPlayers.get(president-1).decreaseTrust();
+				for(int i = 0; i < 5; i++) {
+					if(i != state-1) {
+						otherPlayers.get(i).decreaseTheirTrust();
+						otherPlayers.get(i).decreaseTheirTrust();
+					}
+				}
+				supposedLibCards += libsC;
+				supposedFasCards += fasC+1;
+			
+			}
+		}
+		
+	}
+	
+	public void cardsTold(int chancellor, String toldP, String toldC, int cardOne, int cardTwo, int cardThree) {
+		System.out.println("I'm fucking President\nPresident: " + toldP);
+		System.out.println("Chancellor: " + toldC);
+		String[] linesP = toldP.split(" ");
+		String[] linesC = toldC.split(" ");
+		int libP = Integer.parseInt(linesP[0]);
+		int faP = Integer.parseInt(linesP[2]);
+		int libsC = Integer.parseInt(linesC[0]);
+		int fasC = Integer.parseInt(linesC[2]);
+		
+		int libsP = 0;
+		int fasP = 0;
+		
+		if(cardOne == 1) {
+			libsP++;
+		} else {
+			fasP++;
+		}
+		if(cardTwo == 1) {
+			libsP++;
+		} else {
+			fasP++;
+		}
+		if(cardThree == 1) {
+			libsP++;
+		} else {
+			fasP++;
+		}
+		
+		if((libsP == libsC && fasP == fasC+1)|| (libsP == libsC+1 && fasP == libsC)) {
+			if(!((libP == libsC && faP == fasC+1) || (libP == libsC+1 && faP == fasC))){
+				for(int i = 0; i < 5; i++) {
+					if(i != state-1) {
+						otherPlayers.get(i).decreaseTheirTrust();
+						otherPlayers.get(i).decreaseTheirTrust();
+					}
+				}
+			}
+		}else if((libP == libsC && faP == fasC+1) || (libP == libsC+1 && faP == fasC)){
+			otherPlayers.get(chancellor-1).increaseTrust();
+			otherPlayers.get(chancellor-1).increaseTrust();
+		}else {
+			otherPlayers.get(chancellor-1).decreaseTrust();
+			otherPlayers.get(chancellor-1).decreaseTrust();
+			for(int i = 0; i < 5; i++) {
+				if(i != state-1) {
+					otherPlayers.get(i).decreaseTheirTrust();
+					otherPlayers.get(i).decreaseTheirTrust();
+				}
+			}
+		}
+		
+	}
+	
 	public void checkThreeCards(String one, String two, String three) {
+		saw3Cards = true;
 		String[] pl = new String[3];
 		pl[0] = one;
 		pl[1] = two;
@@ -498,6 +735,15 @@ public class MLBotTrainer extends Player{
 		for(int i = 0; i < 3; i++) {
 			threeCards[i] = pl[i].equals("Liberal") ? 1 : -1;
 		}
+	}
+	
+	public void policyEnacted(int policy) {
+		if(policy == 1) {
+			libCardsEnacted++;
+		} else {
+			fasCardsEnacted++;
+		}
+		electionTracker = 0;
 	}
 	
 	public void checkPlay(String _play) {
@@ -513,8 +759,15 @@ public class MLBotTrainer extends Player{
 		
 		int optionTrust = -1;
 		
+		System.out.println(_play);
 		int _pres = Integer.parseInt(play[0]);
 		int _chanc = Integer.parseInt(play[1]);
+		
+		
+		
+		lastPres = _pres;
+		lastChanc = _chanc;
+		lastPlayed = 0;
 		
 		if(play[2].equals("Y")) { //president and chancellor got accepted
 			if(deckPolicies < 3) {
@@ -524,6 +777,7 @@ public class MLBotTrainer extends Player{
 			}
 			deckPolicies -=3;
 			if(play[3].equals("L")) { //played liberal policy
+				lastPlayed = 1;
 				if(_pres != state) {
 					otherPlayers.get(_pres-1).increaseTrust();
 				} else {
@@ -535,11 +789,12 @@ public class MLBotTrainer extends Player{
 					optionTrust = 0;
 				}
 			} else if(play[3].equals("F")) { //played Fascist policy
+				lastPlayed = -1;
 				if(_pres != state) {
 					if(_pres != otherFascist) {
 						otherPlayers.get(_pres-1).decreaseTrust();
 					} else {
-						otherPlayers.get(otherFascist).increaseTrust();
+						otherPlayers.get(_pres-1).increaseTrust();
 					}
 				} else {
 					optionTrust = 1;
@@ -548,7 +803,7 @@ public class MLBotTrainer extends Player{
 					if(_chanc != otherFascist) {
 						otherPlayers.get(_chanc-1).decreaseTrust();
 					} else {
-						otherPlayers.get(otherFascist).increaseTrust();
+						otherPlayers.get(_chanc-1).increaseTrust();
 					}
 				} else {
 					optionTrust = 1;
@@ -577,6 +832,7 @@ public class MLBotTrainer extends Player{
 					}
 					deckPolicies--;
 					if(play[4].equals("L")) {  //liberal policy came out
+						saw3Cards = false;
 						if(_pres != state) {
 							otherPlayers.get(_pres-1).increaseTheirTrust();
 						} else {
@@ -592,6 +848,7 @@ public class MLBotTrainer extends Player{
 							liberalVictory = true;
 						}
 					} else if(play[4].equals("F")) { //fascist policy came out, fascists win because if veto is on and fascist policy came out, they win because they enacted 6 policies
+						saw3Cards = false;
 						if(_pres != state) {
 							if(_pres != otherFascist) {
 								otherPlayers.get(_pres-1).decreaseTrust();
@@ -613,6 +870,7 @@ public class MLBotTrainer extends Player{
 			} else if (play[3].equals("NV")) { //If the President doesn't accept the Veto
 				_noVeto = true;
 				if(play[4].equals("F")) { //If the Chanc chooses Fascist policy
+					lastPlayed = -1;
 					if(_pres != state) {
 						if(_pres != otherFascist) {
 							otherPlayers.get(_pres-1).decreaseTrust();
@@ -624,10 +882,13 @@ public class MLBotTrainer extends Player{
 					}
 					if(_chanc != state) {
 						otherPlayers.get(_chanc-1).increaseTrust();
+						otherPlayers.get(_chanc-1).increaseTrust();
+						otherPlayers.get(_chanc-1).increaseTrust();
 					} else {
 						optionTrust = 0;
 					}
 				} else if (play[4].equals("L")) { //If the Chanc chooses Liberal Policy
+					lastPlayed = 1;
 					if(_pres != state) {
 						otherPlayers.get(_pres-1).increaseTrust();
 						otherPlayers.get(_pres-1).increaseTrust();
@@ -658,9 +919,9 @@ public class MLBotTrainer extends Player{
 					supposedLibCards = 0;
 				}
 				deckPolicies--;
-				if(play[5].equals("LW")) {
+				if(play[4].equals("LW")) {
 					liberalVictory = true;
-				} else if(play[5].equals("FW")) {
+				} else if(play[4].equals("FW")) {
 					fascistVictory = true;
 				}
 			}
@@ -670,18 +931,15 @@ public class MLBotTrainer extends Player{
 			electionTracker++;
 		}
 		if(play.length > 3) {
-			lastPres = _pres;
-			lastChanc = _chanc;
 			if(_veto) {
 				lastPlayed = (float) (play[4].equals("L") ? 1.5 : -1.5);
+				saw3Cards = false;
 			} else if(_noVeto) {
 				lastPlayed = (float) (play[4].equals("L") ? 0.5: -0.5);
+				saw3Cards = false;
 			}
 			if(gotKilled != 0) {
 				otherPlayers.get(gotKilled-1).died();
-			}
-			if(play[2].equals("Y") && fasCardsEnacted >= 3 && !hitlerVoted) {
-				otherPlayers.get(_chanc-1).detectHitler(false);
 			}
 			if(hitlerKilled) {
 				for(int i = 0; i < 5; i++) {

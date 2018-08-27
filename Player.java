@@ -145,4 +145,44 @@ public class Player {
 		// TODO Auto-generated method stub
 		return -1;
 	}
+	
+	public void didIWin(boolean b) {
+		
+	}
+
+	public String tellCards(int pone, int ptwo, int pthree, int enacted) {
+		// TODO Auto-generated method stub
+		return "hello";
+	}
+
+	public String tellCards(int cone, int ctwo, int enacted) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void cardsTold(int i, int j, String presTold, String chancTold) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void cardsTold(int i, String presTold, String chancTold, int cone, int ctwo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void cardsTold(int i, String presTold, String chancTold, int pone, int ptwo, int pthree) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void policyEnacted(int i) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void isNotHitler(int chancellor) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

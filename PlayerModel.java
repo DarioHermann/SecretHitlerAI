@@ -10,7 +10,7 @@ public class PlayerModel {
 	
 	public PlayerModel() {
 		trustLevel = 0.1f;
-		theirTrustLevel = 0;
+		theirTrustLevel = 0.1f;
 		isHitler = true;
 		isDead = false;
 		moves = new LinkedList<String>();
@@ -25,6 +25,7 @@ public class PlayerModel {
 	}
 	
 	public void increaseTrust() {
+		String r = "" + trustLevel;
 		if(trustLevel > 1) {
 			trustLevel = ((-1/10)* (trustLevel * trustLevel) + 2 * trustLevel - (1/15)); // (-1/10)x^2 + 2x - 1/15
 		}
@@ -40,10 +41,11 @@ public class PlayerModel {
 		else {
 			trustLevel += 0.1;
 		}
-		System.out.println(trustLevel);
+		System.out.println( r + " increased to " + trustLevel);
 	}
 	
 	public void decreaseTrust() {
+		String r = "" + trustLevel;
 		if(trustLevel > 1) {
 			trustLevel *= (2/3);
 		}
@@ -60,7 +62,7 @@ public class PlayerModel {
 		else {
 			trustLevel -= 0.1;
 		}
-		System.out.println(trustLevel);
+		System.out.println( r + " decreased to " + trustLevel);
 	}
 	
 	public void setTrustLevel(float trust) {
@@ -84,6 +86,7 @@ public class PlayerModel {
 	}
 	
 	public void increaseTheirTrust() {
+		String r = "" + theirTrustLevel;
 		if(theirTrustLevel > 1) {
 			theirTrustLevel = ((-1/10)* (theirTrustLevel * theirTrustLevel) + 2 * theirTrustLevel - (1/15)); // (-1/10)x^2 + 2x - 1/15
 		}
@@ -99,9 +102,11 @@ public class PlayerModel {
 		else {
 			theirTrustLevel += 0.1;
 		}
+		System.out.println( r + " increased to " + theirTrustLevel);
 	}
 	
 	public void decreaseTheirTrust() {
+		String r = "" + theirTrustLevel;
 		if(theirTrustLevel > 1) {
 			theirTrustLevel *= (2/3);
 		}
@@ -118,6 +123,7 @@ public class PlayerModel {
 		else {
 			theirTrustLevel -= 0.1;
 		}
+		System.out.println( r + " decreased to " + theirTrustLevel);
 	}
 	
 	public float getTheirTrustLevel() {
