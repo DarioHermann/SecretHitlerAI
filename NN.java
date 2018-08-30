@@ -144,9 +144,11 @@ public class NN {
 		String[] dna = s.split(",");
 		float[] float_dna = new float[dna.length];
 		for(int i = 0; i < dna.length; i++) {
-			System.out.println(dna[i]);
+			//System.out.println(dna[i]);
 			float_dna[i] = Float.parseFloat(dna[i]);
 		}
+		
+		System.out.println(float_dna[0] + "\n" + float_dna[1]);
 		
 		return float_dna;
 	}

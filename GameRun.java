@@ -39,7 +39,7 @@ public class GameRun extends Game{
 				chancellor = chooseChancellor(president);
 			}while(chancellor == -1);
 			lastChancellor = chancellor;
-			if(chancellor != players.size()+1) {
+			if(chancellor != 6) {
 				if(fasPolicies >= 3 && players.get(playersState.indexOf(chancellor)).getRole().equals("Hitler")) {
 					thePlay += ",HW";
 					System.out.println("Hitler was elected as the Chancellor after three fascist policies have been enacted");
@@ -105,7 +105,7 @@ public class GameRun extends Game{
 				String policy = policiesDeck.remove(0);
 				enactPolicy(policy);
 				power = false;
-				return players.size()+1;
+				return 6;
 			}
 			for(int i = 0; i < players.size(); i++) {
 				if(players.get(i).getTypeOfPlayer() == 1) {

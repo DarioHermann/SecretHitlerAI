@@ -932,7 +932,7 @@ public class MLBotTrainer extends Player{
 		}
 		if(play.length > 3) {
 			if(_veto) {
-				lastPlayed = (float) (play[4].equals("L") ? 1.5 : -1.5);
+				lastPlayed = (float) (play.length > 4 ? (play[4].equals("L") ? 1.5 : -1.5) : 0.0);
 				saw3Cards = false;
 			} else if(_noVeto) {
 				lastPlayed = (float) (play[4].equals("L") ? 0.5: -0.5);

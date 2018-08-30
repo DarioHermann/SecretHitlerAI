@@ -41,7 +41,7 @@ public class Main {
 		}
 		
 		String[] values = new String[20];
-		String filePath = "weights4.txt";
+		String filePath = "weights6.txt";
 			
 		String content = null;
 		try{
@@ -150,82 +150,82 @@ public class Main {
 		
 		//--------------------------------------------------------3
 		
-		Collections.shuffle(roles);
-		System.out.println(roles);		
-		for(int i = 0; i < 5; i++) {
-			//RandomBot n_player = new RandomBot(roles.get(i), i);
-			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+10));
-			players_three.add(n_player);
-			if(roles.get(i).equals("Hitler")) {
-				fascists_three.set(1, i+1);
-			} else if(roles.get(i).equals("Fascist")) {
-				fascists_three.set(0, i+1);
-			}
-		}
-				
-		secretHitler_three.makePlayersState(players_three);
-		for(int i = 0; i < 5; i++) {
-			players_three.get(i).receiveRole(fascists_three);
-		}
-		victory = secretHitler_three.start();
-		
-		if(victory == 1 ) { //LIBERALS WIN
-			for(int i = 0; i < 5; i++) {
-				if(roles.get(i).equals("Liberal")) {
-					players_three.get(i).didIWin(true);
-				} else {
-					players_three.get(i).didIWin(false);
-				}
-			}
-		} else {
-			for(int i = 0; i < 5; i++) {
-				if(roles.get(i).equals("Liberal")) {
-					players_three.get(i).didIWin(false);
-				} else {
-					players_three.get(i).didIWin(true);
-				}
-			}
-		}
-				
-				
-		//--------------------------------------------------------4
-				
 //		Collections.shuffle(roles);
 //		System.out.println(roles);		
 //		for(int i = 0; i < 5; i++) {
 //			//RandomBot n_player = new RandomBot(roles.get(i), i);
-//			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+15));
-//			players_four.add(n_player);
+//			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+10));
+//			players_three.add(n_player);
 //			if(roles.get(i).equals("Hitler")) {
-//				fascists_four.set(1, i+1);
+//				fascists_three.set(1, i+1);
 //			} else if(roles.get(i).equals("Fascist")) {
-//				fascists_four.set(0, i+1);
+//				fascists_three.set(0, i+1);
 //			}
 //		}
 //				
-//		secretHitler_four.makePlayersState(players_four);
+//		secretHitler_three.makePlayersState(players_three);
 //		for(int i = 0; i < 5; i++) {
-//			players_four.get(i).receiveRole(fascists_four);
+//			players_three.get(i).receiveRole(fascists_three);
 //		}
-//		victory = secretHitler_four.start();
+//		victory = secretHitler_three.start();
 //		
 //		if(victory == 1 ) { //LIBERALS WIN
 //			for(int i = 0; i < 5; i++) {
 //				if(roles.get(i).equals("Liberal")) {
-//					players_four.get(i).didIWin(true);
+//					players_three.get(i).didIWin(true);
 //				} else {
-//					players_four.get(i).didIWin(false);
+//					players_three.get(i).didIWin(false);
 //				}
 //			}
 //		} else {
 //			for(int i = 0; i < 5; i++) {
 //				if(roles.get(i).equals("Liberal")) {
-//					players_four.get(i).didIWin(false);
+//					players_three.get(i).didIWin(false);
 //				} else {
-//					players_four.get(i).didIWin(true);
+//					players_three.get(i).didIWin(true);
 //				}
 //			}
 //		}
+				
+				
+		//--------------------------------------------------------4
+				
+		Collections.shuffle(roles);
+		System.out.println(roles);		
+		for(int i = 0; i < 5; i++) {
+			//RandomBot n_player = new RandomBot(roles.get(i), i);
+			MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(i+15));
+			players_four.add(n_player);
+			if(roles.get(i).equals("Hitler")) {
+				fascists_four.set(1, i+1);
+			} else if(roles.get(i).equals("Fascist")) {
+				fascists_four.set(0, i+1);
+			}
+		}
+				
+		secretHitler_four.makePlayersState(players_four);
+		for(int i = 0; i < 5; i++) {
+			players_four.get(i).receiveRole(fascists_four);
+		}
+		victory = secretHitler_four.start();
+		
+		if(victory == 1 ) { //LIBERALS WIN
+			for(int i = 0; i < 5; i++) {
+				if(roles.get(i).equals("Liberal")) {
+					players_four.get(i).didIWin(true);
+				} else {
+					players_four.get(i).didIWin(false);
+				}
+			}
+		} else {
+			for(int i = 0; i < 5; i++) {
+				if(roles.get(i).equals("Liberal")) {
+					players_four.get(i).didIWin(false);
+				} else {
+					players_four.get(i).didIWin(true);
+				}
+			}
+		}
 		
 		//----------------------------------------------------------
 		
@@ -237,14 +237,14 @@ public class Main {
 			positions[i+5] = i+5;
 //			fitness[i+5] = players_two.get(i).getTotalCost();
 			positions[i+10] = i+10;
-			fitness[i+10] = players_three.get(i).getTotalCost();
+//			fitness[i+10] = players_three.get(i).getTotalCost();
 			positions[i+15] = i+15;
-//			fitness[i+15] = players_four.get(i).getTotalCost();
+			fitness[i+15] = players_four.get(i).getTotalCost();
 		}
 		
 		
 		//----------------------------------------------------------1
-//		
+		
 //		try(FileWriter fw = new FileWriter("fitnesses1.txt", false);
 //				BufferedWriter bw = new BufferedWriter(fw);
 //				PrintWriter out = new PrintWriter(bw)) {
@@ -281,31 +281,8 @@ public class Main {
 		
 		//-----------------------------------------------3
 		
-		String n_filePath = "fitnesses2.txt";
-				
-		String n_content = null;
-		try{
-			n_content = new String ( Files.readAllBytes( Paths.get(n_filePath) ) );
-		}catch (IOException e){
-			e.printStackTrace();
-		}
-		
-		try(FileWriter fw = new FileWriter("fitnesses3.txt", false);
-				BufferedWriter bw = new BufferedWriter(fw);
-				PrintWriter out = new PrintWriter(bw)) {
-			out.println(n_content);
-			for(int i = 10; i < 15; i++) {
-				out.println(fitness[i]);
-			}
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		//-----------------------------------------------4
-		
-//		String n_filePath = "fitnesses3.txt";
-//		
+//		String n_filePath = "fitnesses2.txt";
+//				
 //		String n_content = null;
 //		try{
 //			n_content = new String ( Files.readAllBytes( Paths.get(n_filePath) ) );
@@ -313,61 +290,127 @@ public class Main {
 //			e.printStackTrace();
 //		}
 //		
-//		
-//		
-//		String[] _cont = n_content.split("\\r?\\n");
-//
-//		for(int i = 0; i < 15; i++) {
-//			fitness[i] = Float.parseFloat(_cont[i]);
-//		}
-//		
-//		
-//		try(FileWriter fw = new FileWriter("fitnesses4.txt", false);
+//		try(FileWriter fw = new FileWriter("fitnesses3.txt", false);
 //				BufferedWriter bw = new BufferedWriter(fw);
 //				PrintWriter out = new PrintWriter(bw)) {
-//			for(int i = 0; i < 20; i++) {
-//				out.println(i + "\t\t" + fitness[i]);
+//			out.println(n_content);
+//			for(int i = 10; i < 15; i++) {
+//				out.println(fitness[i]);
 //			}
 //		} catch (IOException e1) {
 //			// TODO Auto-generated catch block
 //			e1.printStackTrace();
 //		}
-//		
-//		
-//		for(int i = 0; i < 19; i++) {
-//			for(int j = 0; j < 19 - i; j++) {
-//				if(fitness[j] > fitness[j+1]) {
-//					float x = fitness[j];
-//					fitness[j] = fitness[j+1];
-//					fitness[j+1] = x;
-//					
-//					int y = positions[j];
-//					positions[j] = positions[j+1];
-//					positions[j+1] = y;
-//				}
-//			}
-//		}
-//				
-//		float[][] survivors = new float[4][];
-//		for(int i = 0; i < 4; i++) {
-//			survivors[i] = neuralNetworks.get(positions[i]).getBrain();
-//		}
-//		
-//		GeneticAlgorithms ga = new GeneticAlgorithms(survivors);
-//		
-//		ga.generateChildren();
-//		String[] newGeneration = ga.getNew_Gen_String();
-//		
-//		try(FileWriter fw = new FileWriter("weights5.txt", false);
-//				BufferedWriter bw = new BufferedWriter(fw);
-//				PrintWriter out = new PrintWriter(bw)) {
-//			for(int i = 0; i < newGeneration.length; i++) {
-//				out.println(newGeneration[i]);
-//			}
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
+		
+		//-----------------------------------------------4
+		
+		String n_filePath = "fitnesses3.txt";
+		
+		String n_content = null;
+		try{
+			n_content = new String ( Files.readAllBytes( Paths.get(n_filePath) ) );
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		
+		
+		
+		String[] _cont = n_content.split("\\r?\\n");
+
+		for(int i = 0; i < 15; i++) {
+			fitness[i] = Float.parseFloat(_cont[i]);
+		}
+		
+		
+		try(FileWriter fw = new FileWriter("fitness_Final.txt", false);
+				BufferedWriter bw = new BufferedWriter(fw);
+				PrintWriter out = new PrintWriter(bw)) {
+			for(int i = 0; i < 20; i++) {
+				out.println(i+1 + "\t\t" + fitness[i]);
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		try(FileWriter fw = new FileWriter("fitnesses4.txt", false);
+				BufferedWriter bw = new BufferedWriter(fw);
+				PrintWriter out = new PrintWriter(bw)) {
+			for(int i = 0; i < 20; i++) {
+				out.println(fitness[i]);
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		n_filePath = "fitnesses4.txt";
+		
+		n_content = null;
+		try{
+			n_content = new String ( Files.readAllBytes( Paths.get(n_filePath) ) );
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		
+		_cont = n_content.split("\\r?\\n");
+		
+				for(int i = 0; i < 20; i++) {
+					fitness[i] = Float.parseFloat(_cont[i]);
+				}
+		
+				
+		
+		
+		for(int i = 0; i < 19; i++) {
+			for(int j = 0; j < 19 - i; j++) {
+				if(fitness[j] > fitness[j+1]) {
+					float x = fitness[j];
+					fitness[j] = fitness[j+1];
+					fitness[j+1] = x;
+					
+					int y = positions[j];
+					positions[j] = positions[j+1];
+					positions[j+1] = y;
+				}
+			}
+		}
+		
+		try(FileWriter fw = new FileWriter("fitness_Final2.txt", false);
+				BufferedWriter bw = new BufferedWriter(fw);
+				PrintWriter out = new PrintWriter(bw)) {
+			for(int i = 0; i < 20; i++) {
+				out.println(positions[i]+1 + "\t\t" + fitness[i]);
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+		float[][] survivors = new float[4][];
+		for(int i = 0; i < 4; i++) {
+			survivors[i] = neuralNetworks.get(positions[i]).getBrain();
+		}
+		
+		GeneticAlgorithms ga = new GeneticAlgorithms(survivors);
+		
+		ga.generateChildren();
+		String[] newGeneration = ga.getNew_Gen_String();
+		
+
+		//System.out.println(newGeneration[0] + "\n" + newGeneration[1]);
+		
+		try(FileWriter fw = new FileWriter("weights7.txt", false);
+				BufferedWriter bw = new BufferedWriter(fw);
+				PrintWriter out = new PrintWriter(bw)) {
+			for(int i = 0; i < newGeneration.length; i++) {
+				out.println(newGeneration[i]);
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		
 		/*
