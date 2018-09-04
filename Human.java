@@ -4,15 +4,16 @@ public class Human extends Player{
 
 	public Human(String role, int state) {
 		super(role, state);
+		System.out.println("You're player " + state);
 	}
 	
 	public void receiveRole(ArrayList<Integer> showRoles) {
-		if(showRoles.get(0).equals("Liberal")) {
+		if(role.equals("Liberal")) {
 			System.out.println("You are a Liberal");
-		} else if(showRoles.get(0).equals("Hitler")) {
-			System.out.println("You are Hitler and the other Fascist is Player "+ showRoles.get(1));
+		} else if(role.equals("Hitler")) {
+			System.out.println("You are Hitler and the other Fascist is Player "+ showRoles.get(0));
 		} else {
-			System.out.println("You are a Fascist and Player " + showRoles.get(2) + " is Hitler");
+			System.out.println("You are a Fascist and Player " + showRoles.get(1) + " is Hitler");
 		}
 	}
 	
@@ -103,8 +104,7 @@ public class Human extends Player{
 		System.out.println("President, choose one player to kill");
 		int choice = sc.nextInt();
 		boolean canKill = false;
-		players.remove(state);
-		if(players.contains(choice)) {
+		if(players.contains(choice) && choice != state) {
 			canKill = true;
 		}
 		while(!canKill) {
@@ -116,4 +116,27 @@ public class Human extends Player{
 		return choice;
 	}
 	
+	public String tellCards(int one, int two, int three, int enacted) {
+		
+		
+		String[] results = new String[4];
+		
+		results[0] = "3 Liberals 0 Fascists";
+		results[1] = "2 Liberals 1 Fascist";
+		results[2] = "1 Liberal 2 Fascists";
+		results[3] = "0 Liberals 3 Fascists";
+
+		return results[sc.nextInt()];
+	}
+	
+	
+	public String tellCards(int one, int two, int enacted) {
+		
+		String[] results = new String[3];
+		results[0] = "2 Liberals 0 Fascists";
+		results[1] = "1 Liberal 1 Fascists";
+		results[2] = "0 Liberals 2 Fascists";
+		
+		return results[sc.nextInt()];
+	}
 }

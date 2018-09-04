@@ -38,7 +38,6 @@ public class GameRun extends Game{
 				president = (president+1)%players.size();
 				chancellor = chooseChancellor(president);
 			}while(chancellor == -1);
-			lastChancellor = chancellor;
 			if(chancellor != 6) {
 				if(fasPolicies >= 3 && players.get(playersState.indexOf(chancellor)).getRole().equals("Hitler")) {
 					thePlay += ",HW";

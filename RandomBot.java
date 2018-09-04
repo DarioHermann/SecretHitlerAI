@@ -78,4 +78,47 @@ public class RandomBot extends Player {
 		n_pl.remove((Object) state);
 		return n_pl.get(rnd.nextInt(n_pl.size()));
 	}
+	
+	public String tellCards(int one, int two, int three, int enacted) {
+		int _pol[] = new int[3];
+		_pol[0] = one;
+		_pol[1] = two;
+		_pol[2] = three;
+		
+		int crd = 0;
+		for(int i = 0; i < 3; i++) {
+			crd += _pol[i];
+		}
+		
+		String[] results = new String[4];
+		
+		results[0] = "3 Liberals 0 Fascists";
+		results[1] = "2 Liberals 1 Fascist";
+		results[2] = "1 Liberal 2 Fascists";
+		results[3] = "0 Liberals 3 Fascists";
+		
+		return results[rnd.nextInt(4)];
+		
+	}
+	
+	
+	public String tellCards(int one, int two, int enacted) {
+		int[] _pol = new int[2];
+		_pol[0] = one;
+		_pol[1] = two;
+		
+		int crd = 0;
+		
+		for(int i = 0; i < 2; i++) {
+			crd += _pol[i];
+		}
+		
+		String[] results = new String[3];
+		results[0] = "2 Liberals 0 Fascists";
+		results[1] = "1 Liberal 1 Fascists";
+		results[2] = "0 Liberals 2 Fascists";
+		
+
+		return results[rnd.nextInt(3)];
+	}
 }

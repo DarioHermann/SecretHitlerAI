@@ -509,7 +509,7 @@ public class NNTrainer {
 		
 		
 		float[] cost = nn.calculateCost(out, correctValues);
-		nn.correctNN(inp, out, correctValues);
+//		nn.correctNN(inp, out, correctValues);
 		
 		
 		
@@ -527,6 +527,50 @@ public class NNTrainer {
 			e1.printStackTrace();
 		}
 		
+		
+		filePath = "CostValues.txt";
+		
+		content = null;
+		try{
+			content = new String ( Files.readAllBytes( Paths.get(filePath) ) );
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		
+		String[] _costs = content.split("//r?//n");
+		float[] old_cost = new float[_costs.length-1];
+		int rounds = Integer.parseInt(_costs[_costs.length-1]);
+		rounds++;
+		
+		for(int i = 0; i < old_cost.length; i++) {
+			old_cost[i] = Float.parseFloat(_costs[i]);
+			old_cost[i] += cost[i];
+		}
+		
+		
+		
+		try(FileWriter fw = new FileWriter("CostValues.txt", false);
+	    		BufferedWriter bw = new BufferedWriter(fw);
+	    		PrintWriter out2 = new PrintWriter(bw)) {
+			int i = 0;
+			for(i = 0; i < old_cost.length; i++) {
+				out2.println(old_cost[i]);
+			}
+			out2.print(rounds);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+		if(rounds == 50) {
+			for(int i = 0; i < old_cost.length; i++) {
+				old_cost[i] /= rounds;
+			}
+		}
+		
+		nn.correctNN(inp, out, correctValues);
+
 		
 		File myFoo = new File("n_weights.txt");
 		FileWriter fooWriter;
