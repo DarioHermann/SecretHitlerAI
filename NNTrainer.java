@@ -1,3 +1,15 @@
+/*************************************************************
+ * NNTrainer.java
+ * Secret Hitler
+ *
+ * MSc Computer Games Systems
+ * Nottingham Trent University
+ * Major Project
+ * 
+ * Dario Hermann N0773470
+ * 2017/18
+ *************************************************************/
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,6 +25,12 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
 
+
+/**
+ * Class I used to train the Neural Network with backpropagation
+ * Since I don't use I'm stoped updating it and now has old code which is useless. 
+ *
+ */
 public class NNTrainer {
 	
 	private Random rnd = new Random(System.currentTimeMillis());

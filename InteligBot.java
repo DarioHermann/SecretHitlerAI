@@ -1,3 +1,15 @@
+/*************************************************************
+ * InteligBot.java
+ * Secret Hitler
+ *
+ * MSc Computer Games Systems
+ * Nottingham Trent University
+ * Major Project
+ * 
+ * Dario Hermann N0773470
+ * 2017/18
+ *************************************************************/
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -6,6 +18,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
+
+/**
+ * Class for the IntelligentBot 
+ *
+ */
 public class InteligBot extends Player{
 	private int otherFascist;
 	Random rnd;
@@ -29,11 +46,14 @@ public class InteligBot extends Player{
 	
 //	Other Players
 	private LinkedList<PlayerModel> otherPlayers;
-//	private PlayerModel p1;
-//	private PlayerModel p2;
-//	private PlayerModel p3;
-//	private PlayerModel p4;
 	
+	/**
+	 * InteligBot()
+	 * InteligBot.java constructor
+	 * 
+	 * @param role 		the player's role (Liberal, Fascist or Hitler)
+	 * @param state		The player's player number (1-5)
+	 */
 	public InteligBot(String role, int state) {
 		super(role, state);
 		typeOfPlayer = 1;
@@ -65,6 +85,14 @@ public class InteligBot extends Player{
 		
 	}
 	
+	
+	/**
+	 * receiveRole()
+	 * The Bot receives the information of the Fascists, but only stores the information if he himself belongs to the Fascist party
+	 * If the bot is a fascist he will have a higher trust level for the other fascist
+	 * 
+	 * @param showRoles 	The player numbers of both fascists
+	 */
 	public void receiveRole(ArrayList<Integer> showRoles) {
 		if(role.equals("Hitler")) {
 			otherFascist = showRoles.get(0);
@@ -87,14 +115,28 @@ public class InteligBot extends Player{
 		otherPlayers.get(state-1).setRole("Me");
 	}
 	
+	
+	/**
+	 * isNotHitler()
+	 * Confirms a player as not being Hitler after it had been elected as chancellor with 3 or more fascist policies enacted
+	 * 
+	 * @param chancellor 	The chancellor in question
+	 */
 	public void isNotHitler(int chancellor) {
 		otherPlayers.get(chancellor-1).detectHitler(false);
 	}
 	
-	private void analyzePlay(float[] inps, float[] out) {
-		
-	}
 	
+	/**
+	 * int chooseChancellor()
+	 * The action to choose a Chancellor
+	 * it will try to choose the player he most trusts or choose a player who is more secure to choose depending on the circumstances
+	 * 
+	 * @param president 		President's player number
+	 * @param lastChancellor 	Last round's chancellor player number
+	 * @param players 			A list of all the players still in the game
+	 * @return 	The player number of the chosen Chancellor
+	 */
 	public int chooseChancellor(int president, int lastChancellor, ArrayList<Integer> players) {
 		pres = president;
 		chanc = 0;
@@ -128,14 +170,14 @@ public class InteligBot extends Player{
 				}
 			}
 		}
-		if(libCardsEnacted+fasCardsEnacted >= 0 && libCardsEnacted+fasCardsEnacted <= 3) {
+		if(libCardsEnacted+fasCardsEnacted >= 0 && libCardsEnacted+fasCardsEnacted <= 3) { //In the beggining of the game tries to choose a player who is 3 position after him
 			int res = state + 2 % 5 + 1;
 			if(pls.contains(res)) {
 				return res;
 			}
 		}
-		if(role.equals("Fascist")) {
-			if(pls.contains(otherFascist)) {
+		if(role.equals("Fascist")) { 
+			if(pls.contains(otherFascist)) { //if the bot is a fascist and the other fascist is in the top 3 most trusted players of his list, he will try to choose that player
 				for(int i = 0; i < 3; i++) {
 					if(choose[i] == otherFascist) {
 						return choose[i];
@@ -143,7 +185,7 @@ public class InteligBot extends Player{
 				}
 			}
 		}
-		if(confNoHitlers > 0) {
+		if(confNoHitlers > 0) { //Tries to choose someone already confirmed as not being Hitler and on the top 3 most trusted players
 			for(int i = 0; i < 3; i++) {
 				if(confirmedNotHitler[choose[i]-1] && pls.contains(choose[i])) {
 					if(rnd.nextFloat() < 0.8) {
@@ -167,10 +209,19 @@ public class InteligBot extends Player{
 		return choose[4];
 	}
 	
+	
+	/**
+	 * String vote()
+	 * Vote on the Presidential election (President + Chancellor)
+	 * The vote will depend on how much he trusts the two players in question and if special case occur
+	 * 
+	 * @param president 	President
+	 * @param chancellor 	Chancellor
+	 * @return "Y" for yes and "N" for No
+	 */
 	public String vote(int president, int chancellor) {
 		pres = president;
 		chanc = chancellor;
-		float[] out;
 		
 		if(president == state) {
 			return "Y";
@@ -244,6 +295,16 @@ public class InteligBot extends Player{
 		return "Y";
 	}
 	
+	
+	/**
+	 * int discardCard()
+	 * The action to discard a card if the bot is the president
+	 * 
+	 * @param one 	first card
+	 * @param two	second card
+	 * @param three third card
+	 * @return the card the bot wants to discard
+	 */
 	public int discardCard(String one, String two, String three) {
 		int[] _pol = new int[3];
 		int crd=0;
@@ -331,6 +392,15 @@ public class InteligBot extends Player{
 		}	
 	}
 	
+	
+	/**
+	 * int discardCard()
+	 * The action to discard a card if the bot is the Chancellor
+	 * 
+	 * @param one 	first card
+	 * @param two	second card
+	 * @return the card the bot wants to discard or veto if the opportunity so presents
+	 */
 	public int discardCard(String one, String two, boolean veto) {
 		int[] _pol = new int[2];
 		String[] pol = new String[2];
@@ -387,6 +457,15 @@ public class InteligBot extends Player{
 		}
 	}
 	
+	
+	/**
+	 * boolean voteVeto
+	 * Voting if the bot accepts the veto proposed by the chancellor
+	 * 
+	 * @param one 	first card
+	 * @param two 	second card
+	 * @return true if it agrees with the veto, false otherwise
+	 */
 	public boolean voteVeto(String one, String two) {
 		int[] _pol = new int[2];
 		String[] pol = new String[2];
@@ -418,7 +497,13 @@ public class InteligBot extends Player{
 	}
 	
 	
-	
+	/**
+	 * int killPlayer()
+	 * The action to kill a player
+	 * 
+	 * @param players 	The players still in the game
+	 * @return The player the bot wants to kill
+	 */
 	public int killPlayer(ArrayList<Integer> players) {
 		float[] pl = new float[5];
 		int[] num = new int[5];
@@ -443,7 +528,7 @@ public class InteligBot extends Player{
 		}
 		
 		if(role.equals("Liberal")) {
-			if(num[1] != state && (otherPlayers.get(num[1]-1).isHeHitler() && !otherPlayers.get(num[1]-1).getDeathStatus())) {
+			if(num[1] != state && (otherPlayers.get(num[1]-1).isHeHitler() && !otherPlayers.get(num[1]-1).getDeathStatus())) { //the bot will try to kill the player less truste who was not confirmed not being hitler and is still alive
 				return num[1];
 			} else {
 				for(int i = 0; i < 5; i++) {
@@ -455,7 +540,7 @@ public class InteligBot extends Player{
 		} else {
 			for(int i = 0; i < 5; i++) {
 				if(num[i] != state && num[i] != otherFascist) {
-					if(otherPlayers.get(num[i]-1).isHeHitler() && !otherPlayers.get(num[i]-1).getDeathStatus()) {
+					if(otherPlayers.get(num[i]-1).isHeHitler() && !otherPlayers.get(num[i]-1).getDeathStatus()) { //if it is a fascist, he will try to kill someone not confirmed as not being Hitler, who's alive and is not the otherFascist
 						return num[i];
 					}
 				}
@@ -466,6 +551,16 @@ public class InteligBot extends Player{
 	}
 	
 	
+	/**
+	 * String tellCards
+	 * Telling what cards the bot had in his "hand" (this method is for the president)
+	 * 
+	 * @param one		first card
+	 * @param two 		second card
+	 * @param three 	third card
+	 * @param enacter	the policy that was enacted
+	 * @return What cards the player had in his "hand"
+	 */
 	public String tellCards(int one, int two, int three, int enacted) {
 		lastPlayed = enacted;
 		int _pol[] = new int[3];
@@ -546,6 +641,15 @@ public class InteligBot extends Player{
 	}
 	
 	
+	/**
+	 * String tellCards
+	 * Telling what cards the bot had in his "hand" (this method is for the chancellor)
+	 * 
+	 * @param one		first card
+	 * @param two 		second card
+	 * @param enacter	the policy that was enacted
+	 * @return What cards the player had in his "hand"
+	 */
 	public String tellCards(int one, int two, int enacted) {
 		lastPlayed = enacted;
 		int[] _pol = new int[2];
@@ -600,6 +704,15 @@ public class InteligBot extends Player{
 	}
 	
 	
+	/**
+	 * cardsTold()
+	 * Cards Told by the president and chancellor (when the player is none of those two)
+	 * 
+	 * @param president		president player number
+	 * @param chancellor	chancellor player number
+	 * @param toldP			what the president told
+	 * @param toldC		 	what the chancellor told
+	 */
 	public void cardsTold(int president, int chancellor, String toldP, String toldC) {
 		String[] linesP = toldP.split(" ");
 		String[] linesC = toldC.split(" ");
@@ -611,7 +724,7 @@ public class InteligBot extends Player{
 		supposedLibCards += libsP;
 		supposedFasCards += fasP;
 		
-		if(saw3Cards) {
+		if(saw3Cards) { //If this player previously saw the three cards on top of the draw pile
 			int libers = 0;
 			int fascer = 0;
 			for(int i = 0; i < 3; i++) {
@@ -623,12 +736,12 @@ public class InteligBot extends Player{
 					fascer++;
 				}
 			}
-			if(libers != libsP && role.equals("Liberal")) {
+			if(libers != libsP && role.equals("Liberal")) { //If a liberal and the president is clearly lying (because saw the three cards)
 				otherPlayers.get(president-1).decreaseTrust();
 				otherPlayers.get(president-1).decreaseTrust();
 				otherPlayers.get(president-1).decreaseTrust();
 			}
-			if(!((libers == libsC && fascer == fasC+1) || (libers == libsC+1 && fascer == fasC))) {
+			if(!((libers == libsC && fascer == fasC+1) || (libers == libsC+1 && fascer == fasC))) { //If a liberal and the chancellor is clearly lying (because saw the three cards)
 				if(role.equals("Liberal")) {
 					otherPlayers.get(chancellor-1).decreaseTrust();
 					otherPlayers.get(chancellor-1).decreaseTrust();
@@ -639,7 +752,7 @@ public class InteligBot extends Player{
 		} else {
 			if((libsP == libsC && fasP == fasC+1)||(libsP == libsC+1 && fasP == fasC)) {
 			
-			} else {
+			} else { //if the president and chancellor claims don't make sense together
 				otherPlayers.get(president-1).decreaseTrust();
 				otherPlayers.get(chancellor-1).decreaseTrust();
 			}
@@ -647,6 +760,17 @@ public class InteligBot extends Player{
 		
 	}
 	
+	
+	/**
+	 * cardsTold()
+	 * Cards Told by the president(when the player is the chancellor)
+	 * 
+	 * @param president		president player number
+	 * @param toldP			what the president told
+	 * @param toldC		 	what the chancellor told
+	 * @param cardOne		first card
+	 * @param cardTwo		second card
+	 */
 	public void cardsTold(int president, String toldP, String toldC, int cardOne, int cardTwo) {
 		String[] linesP = toldP.split(" ");
 		String[] linesC = toldC.split(" ");
@@ -681,7 +805,7 @@ public class InteligBot extends Player{
 					supposedFasCards++;
 					fascer++;
 				}
-				if(libers != libsP && role.equals("Liberal")) {
+				if(libers != libsP && role.equals("Liberal")) { //If what the president told is not true and bots role is liberal
 					otherPlayers.get(president-1).decreaseTrust();
 					otherPlayers.get(president-1).decreaseTrust();
 					otherPlayers.get(president-1).decreaseTrust();
@@ -689,10 +813,10 @@ public class InteligBot extends Player{
 			}
 			saw3Cards = false;
 		} else {
-			if((libsP == libsC && fasP == fasC+1)|| (libsP == libsC+1 && fasP == libsC)) {
+			if((libsP == libsC && fasP == fasC+1)|| (libsP == libsC+1 && fasP == libsC)) { //If what the president told adds up to the cards the bot had in his hand
 				supposedLibCards += libsP;
 				supposedFasCards += fasP;
-				if (!((libsP == libC && fasP == faC+1) || (libsP == libC+1 && fasP == faC))) {
+				if (!((libsP == libC && fasP == faC+1) || (libsP == libC+1 && fasP == faC))) { //but if what was told by the bot doesn't add up
 					for(int i = 0; i < 5; i++) {
 						if(i != state-1) {
 							otherPlayers.get(i).decreaseTheirTrust();
@@ -700,7 +824,7 @@ public class InteligBot extends Player{
 						}
 					}
 				}
-			} else if ((libsP == libC && fasP == faC+1) || (libsP == libC+1 && fasP == faC)){
+			} else if ((libsP == libC && fasP == faC+1) || (libsP == libC+1 && fasP == faC)){ //If was the president and the bot claimed make sense together 
 				otherPlayers.get(president-1).increaseTrust();
 				otherPlayers.get(president-1).increaseTrust();
 				supposedLibCards += libsC;
@@ -722,6 +846,18 @@ public class InteligBot extends Player{
 		
 	}
 	
+
+	/**
+	 * cardsTold()
+	 * Cards Told by the chancellor(when the player is the president)
+	 * 
+	 * @param chancellor	chancellor player number
+	 * @param toldP			what the president told
+	 * @param toldC		 	what the chancellor told
+	 * @param cardOne		first card
+	 * @param cardTwo		second card
+	 * @param cardThree		third card
+	 */
 	public void cardsTold(int chancellor, String toldP, String toldC, int cardOne, int cardTwo, int cardThree) {
 		String[] linesP = toldP.split(" ");
 		String[] linesC = toldC.split(" ");
@@ -749,8 +885,8 @@ public class InteligBot extends Player{
 			fasP++;
 		}
 		
-		if((libsP == libsC && fasP == fasC+1)|| (libsP == libsC+1 && fasP == libsC)) {
-			if(!((libP == libsC && faP == fasC+1) || (libP == libsC+1 && faP == fasC))){
+		if((libsP == libsC && fasP == fasC+1)|| (libsP == libsC+1 && fasP == libsC)) { //if what the chancellor told made sense with the cards the bot had
+			if(!((libP == libsC && faP == fasC+1) || (libP == libsC+1 && faP == fasC))){ //if what the chancellor told doesn't make sense with what the bot claimed
 				for(int i = 0; i < 5; i++) {
 					if(i != state-1) {
 						otherPlayers.get(i).decreaseTheirTrust();
@@ -758,7 +894,7 @@ public class InteligBot extends Player{
 					}
 				}
 			}
-		}else if((libP == libsC && faP == fasC+1) || (libP == libsC+1 && faP == fasC)){
+		}else if((libP == libsC && faP == fasC+1) || (libP == libsC+1 && faP == fasC)){ //if what the chancellor and the bot claimed make sense together
 			otherPlayers.get(chancellor-1).increaseTrust();
 			otherPlayers.get(chancellor-1).increaseTrust();
 		}else {
@@ -774,6 +910,15 @@ public class InteligBot extends Player{
 		
 	}
 	
+	
+	/**
+	 * checkTreeCards
+	 * Checks the three cards on top of the draw pile
+	 * 
+	 * @param one 		first card
+	 * @param two 		second card
+	 * @param three		third card
+	 */
 	public void checkThreeCards(String one, String two, String three) {
 		saw3Cards = true;
 		String[] pl = new String[3];
@@ -786,6 +931,13 @@ public class InteligBot extends Player{
 		}
 	}
 	
+	
+	/**
+	 * policyEnacted()
+	 * Updates the variable of the liberal or fascist cards enacted according to what was played
+	 * 
+	 * @param policy 	The policy that was enacted
+	 */
 	public void policyEnacted(int policy) {
 		if(policy == 1) {
 			libCardsEnacted++;
@@ -795,6 +947,13 @@ public class InteligBot extends Player{
 		electionTracker = 0;
 	}
 	
+	
+	/**
+	 * checkPlay()
+	 * updates some variable and trust levels depending on the round player
+	 * 
+	 * @param _play 	The occurrences of the last round played
+	 */
 	public void checkPlay(String _play) {
 		String[] play = _play.split(",");
 		
@@ -808,7 +967,6 @@ public class InteligBot extends Player{
 		
 		int optionTrust = -1;
 		
-		System.out.println(_play);
 		int _pres = Integer.parseInt(play[0]);
 		int _chanc = Integer.parseInt(play[1]);
 		
@@ -976,7 +1134,7 @@ public class InteligBot extends Player{
 			}
 		}
 		
-		if(play.length == 3) { //so existe no caso de ambos o presidente e o chencellor nao terem sido aceites e o election tracker nao ter chegado ao limite
+		if(play.length == 3) { //This case only happens if both the president and chancellor didn't get accepted and the election tracker limit didn't reach its limit.
 			electionTracker++;
 		}
 		if(play.length > 3) {

@@ -1,15 +1,47 @@
+/*************************************************************
+ * HonestBot.java
+ * Secret Hitler
+ *
+ * MSc Computer Games Systems
+ * Nottingham Trent University
+ * Major Project
+ * 
+ * Dario Hermann N0773470
+ * 2017/18
+ *************************************************************/
+
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * This class is a simple honest bot, used to train the ML Bot
+ * 
+ */
 public class HonestBot extends Player{
 
 	private int otherFascist;
 	Random rnd;
+	
+	
+	/**
+	 * HonestBot()
+	 * HonestBot.java constructor
+	 * 
+	 * @param role 		The bots role (Liberal, Fascist or Hitler)
+	 * @param state		it's player number (1-5)
+	 */
 	public HonestBot(String role, int state) {
 		super(role, state);
 		rnd = new Random(System.currentTimeMillis());
 	}
 	
+	
+	/**
+	 * receiveRole()
+	 * The Bot receives the information of the Fascists, but only stores the information if he himself belongs to the Fascist party
+	 * 
+	 * @param showRoles 	The player numbers of both fascists
+	 */
 	public void receiveRole(ArrayList<Integer> showRoles) {
 		if(role.equals("Hitler")) {
 			otherFascist = showRoles.get(0);
@@ -20,6 +52,17 @@ public class HonestBot extends Player{
 		}
 	}
 	
+	
+	/**
+	 * int chooseChancellor()
+	 * The action to choose a Chancellor, this bot always tries to choose the other fascist as the chancellor if he himself is either the Fascist or Hitler
+	 * If he's a liberal or a fascist who cannot choose the other fascist, he'll choose someone at random.
+	 * 
+	 * @param president 		President's player number
+	 * @param lastChancellor 	Last round's chancellor player number
+	 * @param players 			A list of all the players still in the game
+	 * @return 	The player number of the chosen Chancellor
+	 */
 	public int chooseChancellor(int president, int lastChancellor, ArrayList<Integer> players) {
 		int choose;
 		if(role.equals("Liberal")) {
@@ -33,6 +76,16 @@ public class HonestBot extends Player{
 		return choose;
 	}
 	
+	
+	/**
+	 * String vote()
+	 * Vote on the Presidential election (President + Chancellor)
+	 * It is a random chosen vote with a higher probability of choosing yes
+	 * 
+	 * @param president 	President
+	 * @param chancellor 	Chancellor
+	 * @return "Y" for yes and "N" for No
+	 */
 	public String vote(int president, int chancellor) {
 		if(president == state || chancellor == state) {
 			return "Y";
@@ -49,6 +102,16 @@ public class HonestBot extends Player{
 		}
 	}
 	
+	
+	/**
+	 * int discardCard()
+	 * The action to discard a card if the bot is the president
+	 * 
+	 * @param one 	first card
+	 * @param two	second card
+	 * @param three third card
+	 * @return the card the bot wants to discard
+	 */
 	public int discardCard(String one, String two, String three) {
 		String[] policies = new String[3];
 		policies[0] = one;
@@ -72,6 +135,15 @@ public class HonestBot extends Player{
 		return 2;
 	}
 	
+	
+	/**
+	 * int discardCard()
+	 * The action to discard a card if the bot is the Chancellor
+	 * 
+	 * @param one 	first card
+	 * @param two	second card
+	 * @return the card the bot wants to discard or veto if the opportinity so presents
+	 */
 	public int discardCard(String one, String two, boolean veto) {
 		if(veto) {
 			if(role.equals("Liberal")) {
@@ -96,6 +168,15 @@ public class HonestBot extends Player{
 		return 1;
 	}
 	
+	
+	/**
+	 * boolean voteVeto
+	 * Voting if the bot accepts the veto proposed by the chancellor
+	 * 
+	 * @param one 	first card
+	 * @param two 	second card
+	 * @return true if it agrees with the veto, false otherwise
+	 */
 	public boolean voteVeto(String one, String two) {
 		if(role.equals("Liberal")) {
 			if(one.equals("Fascist") && two.equals("Fascist")) {
@@ -109,6 +190,14 @@ public class HonestBot extends Player{
 		return false;
 	}
 	
+	
+	/**
+	 * int killPlayer()
+	 * The action to kill a player
+	 * 
+	 * @param players 	The players still in the game
+	 * @return The player the bot wants to kill
+	 */
 	public int killPlayer(ArrayList<Integer> players) {
 		ArrayList<Integer> n_pl = new ArrayList<Integer>(players);
 		n_pl.remove((Object) state);
@@ -118,6 +207,17 @@ public class HonestBot extends Player{
 		return n_pl.get(rnd.nextInt(n_pl.size()));
 	}
 	
+	
+	/**
+	 * String tellCards
+	 * Telling what cards the bot had in his "hand" (this method is for the president)
+	 * 
+	 * @param one		first card
+	 * @param two 		second card
+	 * @param three 	third card
+	 * @param enacter	the policy that was enacted
+	 * @return What cards the player had in his "hand"
+	 */
 	public String tellCards(int one, int two, int three, int enacted) {
 		int _pol[] = new int[3];
 		_pol[0] = one;
@@ -148,7 +248,15 @@ public class HonestBot extends Player{
 		
 	}
 	
-	
+	/**
+	 * String tellCards
+	 * Telling what cards the bot had in his "hand" (this method is for the chancellor)
+	 * 
+	 * @param one		first card
+	 * @param two 		second card
+	 * @param enacter	the policy that was enacted
+	 * @return What cards the player had in his "hand"
+	 */
 	public String tellCards(int one, int two, int enacted) {
 		int[] _pol = new int[2];
 		_pol[0] = one;

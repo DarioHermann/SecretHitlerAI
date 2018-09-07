@@ -1,3 +1,15 @@
+/*************************************************************
+ * Main.java
+ * Secret Hitler
+ *
+ * MSc Computer Games Systems
+ * Nottingham Trent University
+ * Major Project
+ * 
+ * Dario Hermann N0773470
+ * 2017/18
+ *************************************************************/
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -7,6 +19,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+
+/**
+ * The starting class of the programm 
+ *
+ */
 
 public class Main {
 	public static void main(String[] args) {
@@ -18,58 +35,51 @@ public class Main {
 		ArrayList<Integer> fascists = new ArrayList<Integer>();
 		ArrayList<Player> players = new ArrayList<Player>();
 		
-		
-		
-		Game secretHitler_four = new GameRun();
-		ArrayList<Player> players_four = new ArrayList<Player>();
-		ArrayList<Integer> fascists_two = new ArrayList<Integer>();
-		ArrayList<Integer> fascists_three = new ArrayList<Integer>();
-		ArrayList<Integer> fascists_four = new ArrayList<Integer>();
 		int victory;
 		float[] fitness = new float[20];
 		int[] positions = new int[20];
 		
 		for(int i =0; i < 2; i++) {
 			fascists.add(-1);
-			fascists_two.add(-1);
-			fascists_three.add(-1);
-			fascists_four.add(-1);
 		}
 		
-		ArrayList<NN> neuralNetworks = new ArrayList<NN>();
+		ArrayList<NN> neuralNetworks = new ArrayList<NN>(); 
 		
 		for(int i = 0; i < 20; i++) {
-			neuralNetworks.add(new NN(48, 30));
+			neuralNetworks.add(new NN(48, 30)); //creates 20 new NN with the intention of later reading all the 20 individuals saved on a txt file
 		}
 		
+		
+
 		String[] values = new String[20];
 		int weightNumb;
 		String filePath = "weightCounter.txt";
 			
 		String content = null;
 		try{
-			content = new String ( Files.readAllBytes( Paths.get(filePath) ) );
+			content = new String ( Files.readAllBytes( Paths.get(filePath) ) ); //This the number of the file of the most recent population
 		}catch (IOException e){
 			e.printStackTrace();
 		}
 		
 		weightNumb = Integer.parseInt(content);
-		
+				
 		filePath = "weights" + weightNumb + ".txt";
 			
 		content = null;
 		try{
-			content = new String ( Files.readAllBytes( Paths.get(filePath) ) );
+			content = new String ( Files.readAllBytes( Paths.get(filePath) ) ); // this loads up the most recent population of weights
 		}catch (IOException e){
 			e.printStackTrace();
 		}
+		
 		
 		values = content.split("\\r?\\n");
 		
 		
 		
 		for(int i = 0; i < 20; i++) {
-			neuralNetworks.get(i).initialWeights(values[i]);
+			neuralNetworks.get(i).initialWeights(values[i]); //adds the initial weights to the NN
 		}
 		
 		
@@ -77,7 +87,7 @@ public class Main {
 			
 		content = null;
 		try{
-			content = new String ( Files.readAllBytes( Paths.get(filePath) ) );
+			content = new String ( Files.readAllBytes( Paths.get(filePath) ) ); //a counter to see what individual the next ML Bot needs to use
 		}catch (IOException e){
 			e.printStackTrace();
 		}
@@ -86,7 +96,7 @@ public class Main {
 		
 		int chosen;
 		
-		boolean[] isML = new boolean[5];
+		boolean[] isML = new boolean[5]; //isML is used to know how many players were ML Bots
 		
 		for(int i=0; i < 5; i++) {
 			isML[i] = false;
@@ -96,61 +106,61 @@ public class Main {
 		
 		Collections.shuffle(roles);
 		System.out.println(roles);		
-		for(int i = 0; i < 5; i++) {
+		for(int i = 0; i < 5; i++) { //choosing what type of players will play
 			do {
-				chosen = rnd.nextInt(8);
-				if(chosen == 0) {
-					HonestBot n_player = new HonestBot(roles.get(i), i+1);
-					players_four.add(n_player);
-				} else if(chosen == 1) {
-					RandomBot n_player = new RandomBot(roles.get(i), i+1);
-					players_four.add(n_player);
-//				} else if(chosen == 2) {
-//					Human n_player = new Human(roles.get(i), i+1);
-//					players_four.add(n_player);
+				chosen = rnd.nextInt(7); //The types of player commented out are only used if the user wants
+//				if(chosen == 0) {
+//					HonestBot n_player = new HonestBot(roles.get(i), i+1);
+//					players.add(n_player);
+//				} else if(chosen == 1) {
+//					RandomBot n_player = new RandomBot(roles.get(i), i+1);
+//					players.add(n_player);
+				/*} else*/ if(chosen == 2) {
+					Human n_player = new Human(roles.get(i), i+1);
+					players.add(n_player);
 				} else if(chosen < 5) {
 					InteligBot n_player = new InteligBot(roles.get(i), i+1);
-					players_four.add(n_player);
-				} else if(chosen < 8) {
-					if(counter < 100) {
-						MLBotTrainer n_player = new MLBotTrainer(roles.get(i), i+1, neuralNetworks.get(counter%20));
-						players_four.add(n_player);
+					players.add(n_player);
+				} else if(chosen < 7) {
+					if(counter < 300) {
+						MLBot n_player = new MLBot(roles.get(i), i+1, neuralNetworks.get(counter));
+						players.add(n_player);
 						isML[i] = true;
 					}
 				}
-			} while(chosen >= 5 && counter == 100);
+			} while(chosen >= 5 && counter == 300);
 			typeOfPlayers[i] = chosen;
 			if(chosen >= 5) {
 				counter++;
 			}
 			
 			if(roles.get(i).equals("Hitler")) {
-				fascists_four.set(1, i+1);
+				fascists.set(1, i+1);
 			} else if(roles.get(i).equals("Fascist")) {
-				fascists_four.set(0, i+1);
+				fascists.set(0, i+1);
 			}
 		}
 				
-		secretHitler_four.makePlayersState(players_four);
+		secretHitler.makePlayersState(players);
 		for(int i = 0; i < 5; i++) {
-			players_four.get(i).receiveRole(fascists_four);
+			players.get(i).receiveRole(fascists);
 		}
-		victory = secretHitler_four.start();
+		victory = secretHitler.start(); //start the game
 		
 		if(victory == 1 ) { //LIBERALS WIN
 			for(int i = 0; i < 5; i++) {
 				if(roles.get(i).equals("Liberal")) {
-					players_four.get(i).didIWin(true);
+					players.get(i).didIWin(true);
 				} else {
-					players_four.get(i).didIWin(false);
+					players.get(i).didIWin(false);
 				}
 			}
 		} else {
 			for(int i = 0; i < 5; i++) {
 				if(roles.get(i).equals("Liberal")) {
-					players_four.get(i).didIWin(false);
+					players.get(i).didIWin(false);
 				} else {
-					players_four.get(i).didIWin(true);
+					players.get(i).didIWin(true);
 				}
 			}
 		}
@@ -163,46 +173,17 @@ public class Main {
 			positions[i+10] = i+10;
 			positions[i+15] = i+15;
 			if(isML[i]) {
-				fitness[c++] = players_four.get(i).getTotalCost();
+				fitness[c++] = players.get(i).getTotalCost();
 			}
 		}
 		
 		for(int i = 0; i < 5; i++) {
-			System.out.print(typeOfPlayers[i] + "\t");
-		}
-//		
+			System.out.print(typeOfPlayers[i] + "\t"); //prints out what type of players were playing
+		}	
 		
 		
 		
-		
-		
-		
-		
-		
-		
-//		String n_filePath = "fitnesses.txt";
-//		
-//		String n_content = null;
-//		try{
-//			n_content = new String ( Files.readAllBytes( Paths.get(n_filePath) ) );
-//		}catch (IOException e){
-//			e.printStackTrace();
-//		}
-		
-		
-		
-//		String[] _cont = n_content.split("\\r?\\n");
-//
-//		for(int i = 0; i < 15; i++) {
-//			fitness[i] = Float.parseFloat(_cont[i]);
-//		}
-		
-		
-		
-		
-		
-		
-		
+		/* FROM THIS POINT UNTIL THE END IT WAS ONLY USED WHILE TRAINING THE MLBOT, OUTSIDE OF TRAINING MODE THIS IS NOT NECESSARY
 		
 		try(FileWriter fw = new FileWriter("fitnesses.txt", true);
 				BufferedWriter bw = new BufferedWriter(fw);
@@ -231,7 +212,7 @@ public class Main {
 		
 		
 		//----------------------------------------------------
-		if(counter >= 100) {
+		if(counter >= 300) {
 			String n_filePath = "fitnesses.txt";
 		
 			String n_content = null;
@@ -249,7 +230,21 @@ public class Main {
 				fitness[i] += Float.parseFloat(_cont[i+40]);
 				fitness[i] += Float.parseFloat(_cont[i+60]);
 				fitness[i] += Float.parseFloat(_cont[i+80]);
+
+				fitness[i] += Float.parseFloat(_cont[i+100]);
+				fitness[i] += Float.parseFloat(_cont[i+120]);
+				fitness[i] += Float.parseFloat(_cont[i+140]);
+				fitness[i] += Float.parseFloat(_cont[i+160]);
+				fitness[i] += Float.parseFloat(_cont[i+180]);
+
+				fitness[i] += Float.parseFloat(_cont[i+200]);
+				fitness[i] += Float.parseFloat(_cont[i+220]);
+				fitness[i] += Float.parseFloat(_cont[i+240]);
+				fitness[i] += Float.parseFloat(_cont[i+260]);
+				fitness[i] += Float.parseFloat(_cont[i+280]);
 			}
+
+			n_filePath = "final_counter.txt";
 			
 			
 			n_content = null;
@@ -259,6 +254,8 @@ public class Main {
 				e.printStackTrace();
 			}
 			
+
+
 			int page = Integer.parseInt(n_content);
 			
 			filePath = "fitness_Final_" + page + ".txt";
@@ -316,9 +313,6 @@ public class Main {
 		
 			ga.generateChildren();
 			String[] newGeneration = ga.getNew_Gen_String();
-		
-
-			//System.out.println(newGeneration[0] + "\n" + newGeneration[1]);
 			
 			
 			
@@ -368,24 +362,17 @@ public class Main {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		}
-		/*
-		NNTrainer n = new NNTrainer();
-		int x = n.train();
-		if(x < 0) {
-			System.out.println("Training NOT SUCCESSFULL");
-		} else {
-			System.out.println("Training SUCCESSFULL");
+
+			filePath = "fitnesses.txt";
+			
+			try(FileWriter fw = new FileWriter(filePath, false);
+					BufferedWriter bw = new BufferedWriter(fw);
+					PrintWriter out = new PrintWriter(bw)) {
+				out.print("");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}*/
 	}
-	
-	/*private static void printRoles(ArrayList<String> showRoles){
-		if(showRoles.get(0).equals("Liberal")) {
-			System.out.println("You are a Liberal");
-		} else if(showRoles.get(0).equals("Hitler")) {
-			System.out.println("You are Hitler and the other Fascist is Player "+ showRoles.get(1));
-		} else {
-			System.out.println("You are a Fascist and Player " + showRoles.get(2) + " is Hitler");
-		}
-	}*/
 }

@@ -1,3 +1,15 @@
+/*************************************************************
+ * MLBotTrainer.java
+ * Secret Hitler
+ *
+ * MSc Computer Games Systems
+ * Nottingham Trent University
+ * Major Project
+ * 
+ * Dario Hermann N0773470
+ * 2017/18
+ *************************************************************/
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -6,6 +18,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
+
+/**
+ * MLBotTrainer is the class used to train 
+ *
+ */
 public class MLBotTrainer extends Player{
 	
 	private int otherFascist;
@@ -13,8 +30,6 @@ public class MLBotTrainer extends Player{
 	private NN nn; //Neural Network
 	
 //	GameVariables
-//	private int numLibCards;
-//	private int numFasCards;
 	private int deckPolicies;
 	private int libCardsEnacted;
 	private int fasCardsEnacted;
@@ -39,11 +54,15 @@ public class MLBotTrainer extends Player{
 	
 //	Other Players
 	private LinkedList<PlayerModel> otherPlayers;
-//	private PlayerModel p1;
-//	private PlayerModel p2;
-//	private PlayerModel p3;
-//	private PlayerModel p4;
 	
+	
+	/**
+	 * MLBotTrainer.java constructor
+	 * 
+	 * @param role 		the player's role (Liberal, Fascist or Hitler)
+	 * @param state		The player's player number (1-5)
+	 * @param nn		The neural network that is going to be used by this bot
+	 */
 	public MLBotTrainer(String role, int state, NN nn) {
 		super(role, state);
 		cardDiscarded = 0;
@@ -53,9 +72,6 @@ public class MLBotTrainer extends Player{
 		won = false;
 		saw3Cards = false;
 		this.nn = nn;
-		//nn = new NN(48, 30);
-//		numLibCards = 6;
-//		numFasCards = 11;
 		deckPolicies = 17;
 		libCardsEnacted = 0;
 		fasCardsEnacted = 0;
@@ -78,23 +94,25 @@ public class MLBotTrainer extends Player{
 		for(int i = 0; i < 5; i++) {
 			otherPlayers.add(new PlayerModel());
 		}
-		
-//		int x = 48*30 + 30 + 30*18 + 18;
-//		
-//		float[] weights = new float[x];
-//		
-//		for(int i = 0; i < x; i++) {
-//			weights[i] = rnd.nextFloat()*8 - 4;
-//		}
-//		
-//		nn.initialWeights(weights);
-//		
 	}
 	
+	
+	/**
+	 * didIWin()
+	 * It is going to update the won variable, which will add or subtract from the fitness depending on the victory condition
+	 * 
+	 * @param true if won false if lost
+	 */
 	public void didIWin(boolean v) {
 		won = v;
 	}
 	
+	
+	/**
+	 * float getTotalCost()
+	 * 
+	 * @return 	Fitness Value
+	 */
 	public float getTotalCost() {
 		totalCost = totalCost / choices;
 		if(won) {
@@ -105,6 +123,14 @@ public class MLBotTrainer extends Player{
 		return totalCost;
 	}
 	
+	
+	/**
+	 * receiveRole()
+	 * The Bot receives the information of the Fascists, but only stores the information if he himself belongs to the Fascist party
+	 * If the bot is a fascist he will have a higher trust level for the other fascist
+	 * 
+	 * @param showRoles 	The player numbers of both fascists
+	 */
 	public void receiveRole(ArrayList<Integer> showRoles) {
 		if(role.equals("Hitler")) {
 			otherFascist = showRoles.get(0);
@@ -131,8 +157,26 @@ public class MLBotTrainer extends Player{
 		otherPlayers.get(state-1).setRole("Me");
 	}
 	
-	//vetoOn = veto is on, if 1 means the bot has to vote if he agrees with veto
-	//canVeto = the power to veto is on, so that's a choice the bot can make
+	/**
+	 * float[] inputNN()
+	 * This is the method that will receive the values for the Input Layer of the NN and call the method to calculate the Output values
+	 * vetoOn = veto is on, if 1 means the bot has to vote if he agrees with veto
+	 * canVeto = the power to veto is on, so that's a choice the bot can make
+	 * 
+	 * @param isPres 				true if player is president, false otherwise
+	 * @param isChanc				true if player is chancellor, false otherwise
+	 * @param chooseChanc			true if the action required by the bot is to choose a chancellor
+	 * @param abilityKillPlayer		true if the action required by the bot it to kill a player
+	 * @param discCard				true if the action required by the bot is to discard a card
+	 * @param vetoOn				true if the chancellor asked for a veto
+	 * @param canVeto				true if there's the possibility to veto
+	 * @param vote					true is the action requires by the bot is to vote on the presidency
+	 * @param cardOne				value of the first card (0 if it is not to discard a card)
+	 * @param cardTwo				value of the second card (0 if it is not to discard a card)
+	 * @param cardThree				value of the third card (0 if it is not to discard a card or the bot is not the president)
+	 * @param tellCardsInHand		true if the action required by the bit is to tell what cards it had in his hand
+	 * @return	the output values of the NN
+	 */
 	private float[] inputNN(boolean isPres, boolean isChanc, boolean chooseChanc, boolean abilityKillPlayer, boolean discCard, boolean vetoOn, boolean canVeto, boolean vote, int cardOne, int cardTwo, int cardThree, boolean tellCardsInHand) {
 		float[] inps = new float[48];
 		for(int i = 0; i < inps.length; i++) {
@@ -184,15 +228,31 @@ public class MLBotTrainer extends Player{
 		
 		
 		float[] output = nn.calculateNN(inps);
-		//analyzePlay(inps, output);
+		analyzePlay(inps, output);
 		return output;
 	}
 	
+	
+	/**
+	 * isNotHitler()
+	 * Confirms a player as not being Hitler after it had been elected as chancellor with 3 or more fascist policies enacted
+	 * 
+	 * @param chancellor 	The chancellor in question
+	 */
 	public void isNotHitler(int chancellor) {
 		otherPlayers.get(chancellor-1).detectHitler(false);
 		
 	}
 	
+	
+	/**
+	 * analyzePlay()
+	 * shows what the input and output values are and let's the trainer (the user of the program) decide what should have been the choices made by the bot
+	 * which then gives an error value
+	 * 
+	 * @param inps	input nodes
+	 * @param out	output nodes
+	 */
 	private void analyzePlay(float[] inps, float[] out) {
 		int counter = 0;
 		choices++;
@@ -260,11 +320,6 @@ public class MLBotTrainer extends Player{
 			correctValues[pos[i]] += (float) (1.0/howMany);
 		}
 		
-//		for(int i = 0; i < correctValues.length; i++) {
-//			System.out.print(i + ": ");
-//			correctValues[i] = Float.parseFloat(sc.next());
-//		}
-		
 		float[] cost = nn.calculateCost(out, correctValues);
 		
 		try(FileWriter fw = new FileWriter("costtable.txt", true);
@@ -286,6 +341,17 @@ public class MLBotTrainer extends Player{
 		}
 	}
 	
+	
+	/**
+	 * int chooseChancellor()
+	 * The action to choose a Chancellor
+	 * the player that is chosen will depend on the values of the output
+	 * 
+	 * @param president 		President's player number
+	 * @param lastChancellor 	Last round's chancellor player number
+	 * @param players 			A list of all the players still in the game
+	 * @return 	The player number of the chosen Chancellor
+	 */
 	public int chooseChancellor(int president, int lastChancellor, ArrayList<Integer> players) {
 		pres = president;
 		chanc = 0;
@@ -321,7 +387,7 @@ public class MLBotTrainer extends Player{
 		for(int i = 0; i < 5; i++) {
 			if(pls.contains(choose[i])) {
 				if(role.equals("Liberal")) {
-					if(pls.size()-notHits == 1) {
+					if(pls.size()-notHits == 1 && otherPlayers.get(pls.get(choose[i]-1)).isHeHitler()) { //If only one player is not confirmed as Hitler and the bot is a liberal and he chooses the only one not confirmed as not hitler, he get +5 points on its fitness
 						totalCost += 5;
 					}
 				}
@@ -331,6 +397,16 @@ public class MLBotTrainer extends Player{
 		return choose[4];
 	}
 	
+	
+	/**
+	 * String vote()
+	 * Vote on the Presidential election (President + Chancellor)
+	 * The vote will depend on the output value of the NN
+	 * 
+	 * @param president 	President
+	 * @param chancellor 	Chancellor
+	 * @return "Y" for yes and "N" for No
+	 */
 	public String vote(int president, int chancellor) {
 		pres = president;
 		chanc = chancellor;
@@ -345,6 +421,16 @@ public class MLBotTrainer extends Player{
 		}
 	}
 	
+	
+	/**
+	 * int discardCard()
+	 * The action to discard a card if the bot is the president
+	 * 
+	 * @param one 	first card
+	 * @param two	second card
+	 * @param three third card
+	 * @return the card the bot wants to discard
+	 */
 	public int discardCard(String one, String two, String three) {
 		int[] _pol = new int[3];
 		String[] pol = new String[3];
@@ -387,11 +473,11 @@ public class MLBotTrainer extends Player{
 		}
 		
 		if(role.equals("Liberal") && (crd == -1|| crd == 1)) {
-			if(_pol[numbs[0]] == 1 && (fasCardsEnacted <= 2 || (fasCardsEnacted == 5 || libCardsEnacted == 4))) {
-				totalCost += 3;
+			if(_pol[numbs[0]] == 1 && (fasCardsEnacted <= 2 || (fasCardsEnacted == 5 || libCardsEnacted == 4))) { //if player is liberal and either fascist cards enacted are less than 3, or 5 or there are 4 liberal cards enacted
+				totalCost += 3;																					  //and given the opportunity to discard the fascist card he discards a liberal card, 3 points get added to his fitness		
 			}
 		} else if(!role.equals("Fascist") && (crd == 1 || crd == -1)) {
-			if(_pol[numbs[0]] == -1 && fasCardsEnacted == 5) {
+			if(_pol[numbs[0]] == -1 && fasCardsEnacted == 5) { //basically the same but for a fascists point of view
 				totalCost += 3;
 			}
 		}
@@ -401,6 +487,15 @@ public class MLBotTrainer extends Player{
 		return numbs[0];
 	}
 	
+	
+	/**
+	 * int discardCard()
+	 * The action to discard a card if the bot is the Chancellor
+	 * 
+	 * @param one 	first card
+	 * @param two	second card
+	 * @return the card the bot wants to discard or veto if the opportunity so presents
+	 */
 	public int discardCard(String one, String two, boolean veto) {
 		int[] _pol = new int[2];
 		String[] pol = new String[2];
@@ -478,6 +573,15 @@ public class MLBotTrainer extends Player{
 		}
 	}
 	
+	
+	/**
+	 * boolean voteVeto
+	 * Voting if the bot accepts the veto proposed by the chancellor
+	 * 
+	 * @param one 	first card
+	 * @param two 	second card
+	 * @return true if it agrees with the veto, false otherwise
+	 */
 	public boolean voteVeto(String one, String two) {
 		int[] _pol = new int[2];
 		String[] pol = new String[2];
@@ -510,7 +614,13 @@ public class MLBotTrainer extends Player{
 		}
 	}
 	
-	
+	/**
+	 * int killPlayer()
+	 * The action to kill a player
+	 * 
+	 * @param players 	The players still in the game
+	 * @return The player the bot wants to kill
+	 */
 	public int killPlayer(ArrayList<Integer> players) {
 		float[] out = inputNN(true, false, false, true, false, false, false, false, 0, 0, 0, false);
 		
@@ -546,6 +656,17 @@ public class MLBotTrainer extends Player{
 		return numbs[0];
 	}
 	
+	
+	/**
+	 * String tellCards
+	 * Telling what cards the bot had in his "hand" (this method is for the president)
+	 * 
+	 * @param one		first card
+	 * @param two 		second card
+	 * @param three 	third card
+	 * @param enacter	the policy that was enacted
+	 * @return What cards the player had in his "hand"
+	 */
 	public String tellCards(int one, int two, int three, int enacted) {
 		lastPlayed = enacted;
 		int _pol[] = new int[3];
@@ -615,6 +736,15 @@ public class MLBotTrainer extends Player{
 	}
 	
 	
+	/**
+	 * String tellCards
+	 * Telling what cards the bot had in his "hand" (this method is for the chancellor)
+	 * 
+	 * @param one		first card
+	 * @param two 		second card
+	 * @param enacter	the policy that was enacted
+	 * @return What cards the player had in his "hand"
+	 */
 	public String tellCards(int one, int two, int enacted) {
 		lastPlayed = enacted;
 		int[] _pol = new int[2];
@@ -674,9 +804,17 @@ public class MLBotTrainer extends Player{
 		return results[choose[0]];
 	}
 	
+	
+	/**
+	 * cardsTold()
+	 * Cards Told by the president and chancellor (when the player is none of those two)
+	 * 
+	 * @param president		president player number
+	 * @param chancellor	chancellor player number
+	 * @param toldP			what the president told
+	 * @param toldC		 	what the chancellor told
+	 */
 	public void cardsTold(int president, int chancellor, String toldP, String toldC) {
-		System.out.println("I'm fucking a sheep\nPresident: " + toldP);
-		System.out.println("Chancellor: " + toldC);
 		String[] linesP = toldP.split(" ");
 		String[] linesC = toldC.split(" ");
 		int libsP = Integer.parseInt(linesP[0]);
@@ -723,9 +861,18 @@ public class MLBotTrainer extends Player{
 		
 	}
 	
+	
+	/**
+	 * cardsTold()
+	 * Cards Told by the president(when the player is the chancellor)
+	 * 
+	 * @param president		president player number
+	 * @param toldP			what the president told
+	 * @param toldC		 	what the chancellor told
+	 * @param cardOne		first card
+	 * @param cardTwo		second card
+	 */
 	public void cardsTold(int president, String toldP, String toldC, int cardOne, int cardTwo) {
-		System.out.println("I'm fucking Chancellor\nPresident: " + toldP);
-		System.out.println("Chancellor: " + toldC);
 		String[] linesP = toldP.split(" ");
 		String[] linesC = toldC.split(" ");
 		int libsP = Integer.parseInt(linesP[0]);
@@ -800,9 +947,19 @@ public class MLBotTrainer extends Player{
 		
 	}
 	
+	
+	/**
+	 * cardsTold()
+	 * Cards Told by the chancellor(when the player is the president)
+	 * 
+	 * @param chancellor	chancellor player number
+	 * @param toldP			what the president told
+	 * @param toldC		 	what the chancellor told
+	 * @param cardOne		first card
+	 * @param cardTwo		second card
+	 * @param cardThree		third card
+	 */
 	public void cardsTold(int chancellor, String toldP, String toldC, int cardOne, int cardTwo, int cardThree) {
-		System.out.println("I'm fucking President\nPresident: " + toldP);
-		System.out.println("Chancellor: " + toldC);
 		String[] linesP = toldP.split(" ");
 		String[] linesC = toldC.split(" ");
 		int libP = Integer.parseInt(linesP[0]);
@@ -854,6 +1011,15 @@ public class MLBotTrainer extends Player{
 		
 	}
 	
+	
+	/**
+	 * checkTreeCards
+	 * Checks the three cards on top of the draw pile
+	 * 
+	 * @param one 		first card
+	 * @param two 		second card
+	 * @param three		third card
+	 */
 	public void checkThreeCards(String one, String two, String three) {
 		saw3Cards = true;
 		String[] pl = new String[3];
@@ -866,6 +1032,13 @@ public class MLBotTrainer extends Player{
 		}
 	}
 	
+	
+	/**
+	 * policyEnacted()
+	 * Updates the variable of the liberal or fascist cards enacted according to what was played
+	 * 
+	 * @param policy 	The policy that was enacted
+	 */
 	public void policyEnacted(int policy) {
 		if(policy == 1) {
 			libCardsEnacted++;
@@ -875,6 +1048,13 @@ public class MLBotTrainer extends Player{
 		electionTracker = 0;
 	}
 	
+	
+	/**
+	 * checkPlay()
+	 * updates some variable and trust levels depending on the round player
+	 * 
+	 * @param _play 	The occurrences of the last round played
+	 */
 	public void checkPlay(String _play) {
 		String[] play = _play.split(",");
 		
@@ -888,7 +1068,6 @@ public class MLBotTrainer extends Player{
 		
 		int optionTrust = -1;
 		
-		System.out.println(_play);
 		int _pres = Integer.parseInt(play[0]);
 		int _chanc = Integer.parseInt(play[1]);
 		
@@ -1056,7 +1235,7 @@ public class MLBotTrainer extends Player{
 			}
 		}
 		
-		if(play.length == 3) { //so existe no caso de ambos o presidente e o chencellor nao terem sido aceites e o election tracker nao ter chegado ao limite
+		if(play.length == 3) { //This case only happens if both the president and chancellor didn't get accepted and the election tracker limit didn't reach its limit.
 			electionTracker++;
 		}
 		if(play.length > 3) {

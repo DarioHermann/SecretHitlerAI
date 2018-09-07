@@ -41,7 +41,6 @@ public class PlayerModel {
 		else {
 			trustLevel += 0.1;
 		}
-		System.out.println( r + " increased to " + trustLevel);
 	}
 	
 	public void decreaseTrust() {
@@ -62,7 +61,6 @@ public class PlayerModel {
 		else {
 			trustLevel -= 0.1;
 		}
-		System.out.println( r + " decreased to " + trustLevel);
 	}
 	
 	public void setTrustLevel(float trust) {
@@ -102,7 +100,6 @@ public class PlayerModel {
 		else {
 			theirTrustLevel += 0.1;
 		}
-		System.out.println( r + " increased to " + theirTrustLevel);
 	}
 	
 	public void decreaseTheirTrust() {
@@ -123,7 +120,6 @@ public class PlayerModel {
 		else {
 			theirTrustLevel -= 0.1;
 		}
-		System.out.println( r + " decreased to " + theirTrustLevel);
 	}
 	
 	public float getTheirTrustLevel() {

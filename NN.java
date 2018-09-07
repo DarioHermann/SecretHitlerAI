@@ -1,4 +1,19 @@
+/*************************************************************
+ * NN.java
+ * Secret Hitler
+ *
+ * MSc Computer Games Systems
+ * Nottingham Trent University
+ * Major Project
+ * 
+ * Dario Hermann N0773470
+ * 2017/18
+ *************************************************************/
 
+/**
+ * This class is represented by the Neural Network  
+ *
+ */
 public class NN {
 
 	private float[] hiddenLayer;
@@ -7,17 +22,24 @@ public class NN {
 	private int inputs;
 	private float[][] outputW;
 	private float[] outputB;
-	private float fitness;
 	
+	/**
+	 * NN.java constructor
+	 * 
+	 * @param numberOfInputs		How many inout nodes the NN will have
+	 * @param hiddenLayerNodes		How many hidden layer nodes the NN will have
+	 */
 	public NN(int numberOfInputs, int hiddenLayerNodes) {
 		hiddenLayer = new float[hiddenLayerNodes];
 		initialWeights(numberOfInputs);
 	}
 	
-	public void setFitness(float fitness) {
-		this.fitness = fitness;
-	}
-	
+	/**
+	 * initialWeights()
+	 * Creating the matrixes and arrays for the NN
+	 * 
+	 * @param inps how many input nodes there will be
+	 */
 	private void initialWeights(int inps) {
 		inputs = inps;
 		outputW = new float[18][];
@@ -44,6 +66,12 @@ public class NN {
 	}
 	
 	
+	/**
+	 * initialWeights()
+	 * assigning weight values to the connections and biases
+	 * 
+	 * @param w		an array with the weight values
+	 */
 	public void initialWeights(float[] w) {
 		for(int i = 0; i < hiddenLayerW.length; i++) {
 			for(int j = 0; j < hiddenLayerW[i].length; j++) {
@@ -61,6 +89,13 @@ public class NN {
 		}
 	}
 	
+	
+	/**
+	 * initialWeights()
+	 * assigning weight values to the connections and biases
+	 * 
+	 * @param s		a string with the weight values
+	 */
 	public void initialWeights(String s) {
 		float[] w = new float[2028];
 		
@@ -87,6 +122,13 @@ public class NN {
 	}
 	
 	
+	/**
+	 * float[] calculateNN
+	 * calculates the values of the output nodes
+	 * 
+	 * @param inps	input nodes
+	 * @return	output nodes
+	 */
 	public float[] calculateNN(float[] inps) {
 		for(int i = 0; i < hiddenLayer.length; i++) {
 			hiddenLayer[i] = reLU(sum(inps, hiddenLayerW[i]) + hiddenLayerB[i]);
@@ -100,6 +142,15 @@ public class NN {
 		return output;
 	}
 	
+	
+	/**
+	 * float sum()
+	 * 
+	 * 
+	 * @param x nodes or connection weights
+	 * @param y	nodes or connection weights
+	 * @return	adds up every multiplication between a node and the respective connection weight
+	 */
 	private float sum(float[] x, float[] y) {
 		float result = 0;
 		for(int i = 0; i < x.length; i++) {
@@ -116,6 +167,12 @@ public class NN {
 		return inp / (1 + Math.abs(inp));
 	}
 	
+	
+	/**
+	 * String readBrain()
+	 *  
+	 * @return 	the connection and biases weights of the NN
+	 */
 	public String readBrain() {
 		String dna = "";
 		for(int i = 0; i < hiddenLayerW.length; i++) {
@@ -139,6 +196,12 @@ public class NN {
 		return dna;
 	}
 	
+	/*
+	 * float[] getBrain
+	 * the same as readBrain but as array of floats instead of a String
+	 * 
+	 * 	@return 	the connection and biases weights of the NN
+	 */
 	public float[] getBrain() {
 		String s = readBrain();
 		String[] dna = s.split(",");
@@ -153,22 +216,34 @@ public class NN {
 		return float_dna;
 	}
 	
+	
+	/*
+	 * float[] getHiddenLayer()
+	 * 
+	 * @return hidden Layer nodes
+	 */
 	public float[] getHiddenLayer() {
 		return hiddenLayer;
 	}
 	
+	/*
+	 * int returnInputs()
+	 * 
+	 * @return input Layer nodes
+	 */
 	public int returnInputs() {
 		return inputs;
 	}
 	
-	public float getFitness() {
-		return fitness;
-	}
 	
-	private int weightCount() {
-		return (hiddenLayerW[0].length * inputs) + outputW.length;
-	}
-	
+	/**
+	 * float[] calculateCost
+	 * Calculates the error cost
+	 * 
+	 * @param output 			output nodes
+	 * @param correctValues		what the output nodes should have been
+	 * @return	the error cost
+	 */
 	public float[] calculateCost(float[] output, float[] correctValues) {
 		float tCost = 0;
 		float[] cost = new float[output.length+1];
@@ -181,6 +256,15 @@ public class NN {
 		
 	}
 	
+	
+	/**
+	 * correctNN()
+	 * Used to make backpropaation but had to give up on it since most of the weight values turned 0
+	 * 
+	 * @param inp				input nodes
+	 * @param out				output nodes
+	 * @param correctValues		what the output nodes shoul have been
+	 */
 	public void correctNN(float[] inp, float[] out, float[] correctValues) {
 		int min = 48*30+30;
 		int max = min + 30*18+18;
